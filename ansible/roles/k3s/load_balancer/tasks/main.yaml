@@ -1,0 +1,24 @@
+- name: Install keepalived and haproxy
+  ansible.builtin.apt:
+    name:
+      - keepalived
+      - haproxy
+    state: present
+
+- name: Configure Keepalived
+  ansible.builtin.template:
+    src: keepalived.{{ k3s_load_balancer_role }}.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  notify: Restart keepalived
+
+- name: Configure HAProxy
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  notify: Restart haproxy

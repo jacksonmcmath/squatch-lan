@@ -1,0 +1,25 @@
+global_defs {
+  enable_script_security
+  script_user root
+}
+
+vrrp_script check_haproxy {
+    script 'killall -0 haproxy' # faster than pidof
+    interval 2
+}
+
+vrrp_instance k3s_lb_vi {
+    interface {{ ansible_default_ipv4.interface }}
+    state BACKUP
+    priority 100
+
+    virtual_router_id 51
+
+    virtual_ipaddress {
+        {{ k3s_load_balancer_virtual_ipaddress }}/24
+    }
+
+    track_script {
+        check_haproxy
+    }
+}
