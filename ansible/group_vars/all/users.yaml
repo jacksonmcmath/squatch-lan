@@ -1,0 +1,31 @@
+root_user_public_ssh_key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/root_ed25519.pub') }}"
+squ4tch_user_public_ssh_key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/squ4tch_ed25519.pub') }}"
+jrm_user_public_ssh_key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/jrm_ed25519.pub') }}"
+
+squ4tch_user:
+  name: squ4tch
+  uid: 67
+  create_home: true
+  groups:
+    - sudo
+  shell: /bin/bash
+  system: true
+  authorized_key: "{{ squ4tch_user_public_ssh_key }}"
+
+jrm_user:
+  name: jrm
+  uid: 1010
+  create_home: true
+  groups:
+    - sudo
+    - users
+  shell: /bin/zsh
+  authorized_key: "{{ jrm_user_public_ssh_key }}"
+  packages:
+    - zsh-autosuggestions
+    - zsh-syntax-highlighting
+
+media_group:
+  name: media
+  gid: 900
+  system: true

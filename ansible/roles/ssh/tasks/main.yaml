@@ -1,0 +1,49 @@
+- name: Enable sudo authentication via ssh-agent
+  ansible.builtin.template:
+    src: pam.d/ssh_agent.conf.j2
+    dest: /etc/pam.d/ssh_agent.conf
+    owner: root
+    group: root
+    mode: u=r,g=r,o=r
+
+- name: Enable SSH_AUTH_SOCK for sudo
+  ansible.builtin.template:
+    src: sudoers.d/ssh_agent.conf.j2
+    dest: /etc/sudoers.d/ssh_agent.conf
+    owner: root
+    group: root
+    mode: u=r,g=r,o=
+
+- name: SSH hardening
+  when: ssh_harden | bool
+  block:
+    - name: Regenerate SSH host keys
+      community.crypto.openssh_keypair:
+        path: "{{ item.path }}"
+        type: "{{ item.type }}"
+        size: "{{ item.size | default(omit) }}"
+        state: present
+      loop:
+        - path: /etc/ssh/ssh_host_rsa_key
+          type: rsa
+          size: 4096
+        - path: /etc/ssh/ssh_host_ed25519_key
+          type: ed25519
+
+    - name: Enable SSH host keys
+      ansible.builtin.template:
+        src: sshd_config.d/host_keys.conf.j2
+        dest: /etc/ssh/sshd_config.d/host_keys.conf
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
+      notify: Restart sshd
+
+    - name: Restrict supported key exchange, cipher, and MAC algorithms
+      ansible.builtin.template:
+        src: sshd_config.d/hardening.conf.j2
+        dest: /etc/ssh/sshd_config.d/hardening.conf
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
+      notify: Restart sshd

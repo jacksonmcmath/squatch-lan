@@ -1,0 +1,28 @@
+- name: Cluster prep
+  hosts:
+    - server
+    - agent
+  gather_facts: true
+  become: true
+  roles:
+    - role: k3s.orchestration.prereq
+    - role: k3s.orchestration.airgap
+    # - role: k3s.orchestration.raspberry_pi
+
+- name: Setup k3s load balancer
+  hosts: load_balancer
+  become: true
+  roles:
+    - role: k3s/load_balancer
+
+- name: Setup k3s server
+  hosts: server
+  become: true
+  roles:
+    - role: k3s.orchestration.k3s_server
+
+- name: Setup k3s agent
+  hosts: agent
+  become: true
+  roles:
+    - role: k3s.orchestration.k3s_agent

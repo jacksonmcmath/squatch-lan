@@ -1,0 +1,10 @@
+pve_nodes:
+  hosts:
+    pve-01-yosemite.squatch.dev:
+      ansible_host: 10.129.12.101
+    # pve-02-denali.squatch.dev:
+    #   ansible_host: 10.129.12.102
+    # pve-03-acadia.squatch.dev:
+    #   ansible_host: 10.129.12.103
+    # pve-04-redwoods.squatch.dev:
+    #   ansible_host: 10.129.12.104
