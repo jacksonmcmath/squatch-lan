@@ -1,0 +1,56 @@
+- name: Install user's shell
+  when: >
+    user.shell is defined and
+    '/sh' not in user.shell and
+    '/bash' not in user.shell and
+    '/nologin' not in user.shell
+  ansible.builtin.package:
+    name: "{{ user.shell | split('/') | last }}"
+    state: present
+
+- name: Create user's primary group
+  when: user.group is undefined or user.group == user.name
+  ansible.builtin.group:
+    name: "{{ user.name }}"
+    gid: "{{ user.uid }}"
+    system: "{{ user.system | default(omit) }}"
+    state: present
+
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ user.name }}"
+    uid: "{{ user.uid }}"
+    create_home: "{{ user.create_home | default(omit) }}"
+    home: "{{ user.home | default(omit) }}"
+    group: "{{ user.group | default(user.name) }}"
+    groups: "{{ user.groups | default(omit) }}"
+    password: "{{ user.password | default('!') }}"
+    shell: "{{ user.shell | default('/usr/bin/nologin') }}"
+    system: "{{ user.system | default(omit) }}"
+    state: present
+
+- name: Add user's SSH key
+  when: user.authorized_key is defined
+  ansible.posix.authorized_key:
+    user: "{{ user.name }}"
+    key: "{{ user.authorized_key }}"
+    state: present
+
+- name: Enable passwordless sudo
+  when: >
+    user.authorized_key is defined and
+    'sudo' in user.groups
+  ansible.builtin.lineinfile:
+    path: /etc/security/authorized_keys
+    line: "{{ user.authorized_key }}"
+    create: true
+    owner: root
+    group: root
+    mode: u=r,g=r,o=
+    state: present
+
+- name: Install user packages
+  when: user.packages is defined
+  ansible.builtin.package:
+    name: "{{ user.packages }}"
+    state: present
