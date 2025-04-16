@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: infrastructure-apps
+  namespace: argo
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jacksonmcmath/squatch-lan
+    targetRevision: HEAD
+    path: squatch-lan-k3s/infrastructure
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

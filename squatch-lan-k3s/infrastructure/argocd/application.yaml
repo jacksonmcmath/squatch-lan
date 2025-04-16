@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argo      
+spec:
+  project: default
+  destination:
+    namespace: argo
+    server: https://kubernetes.default.svc
+  sources:
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argo-cd
+      targetRevision: 7.8.26
+      helm:
+        valueFiles:
+          - $values/squatch-lan-k3s/infrastructure/argocd/values.yaml
+    - repoURL: https://github.com/jacksonmcmath/squatch-lan.git
+      targetRevision: HEAD
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
