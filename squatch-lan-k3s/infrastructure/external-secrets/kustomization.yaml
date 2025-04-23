@@ -11,3 +11,4 @@ helmCharts:
 
 resources:
   - cluster-secret-store.yaml
+  - token-secret.yaml

@@ -12,3 +12,4 @@ helmCharts:
 resources:
   - cluster-issuer-staging.yaml
   - cluster-issuer-production.yaml
+  - token-secret.yaml

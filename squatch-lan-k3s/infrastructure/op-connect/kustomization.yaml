@@ -8,3 +8,6 @@ helmCharts:
     repo: https://1password.github.io/connect-helm-charts/
     version: 1.17.0
     valuesFile: values.yaml
+
+resources:
+  - credentials-secret.yaml
