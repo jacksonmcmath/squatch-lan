@@ -11,3 +11,5 @@ helmCharts:
 
 resources:
   - credentials-secret.yaml
+  - certificate.yaml
+  - ingress-route.yaml

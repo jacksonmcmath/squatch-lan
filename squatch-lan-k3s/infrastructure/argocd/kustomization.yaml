@@ -9,6 +9,6 @@ helmCharts:
     version: 7.8.27
     valuesFile: values.yaml
 
-# resources:
-#   - certificate.yaml
-#   - ingress-route.yaml
+resources:
+  - certificate.yaml
+  - ingress-route.yaml

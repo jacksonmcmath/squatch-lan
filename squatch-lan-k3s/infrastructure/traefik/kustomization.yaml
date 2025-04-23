@@ -6,5 +6,10 @@ helmCharts:
     namespace: traefik
     name: traefik
     repo: https://traefik.github.io/charts
-    version: 35.0.0
+    version: 35.0.1
     valuesFile: values.yaml
+  - releaseName: traefik-crds
+    namespace: traefik
+    name: traefik-crds
+    repo: https://traefik.github.io/charts
+    version: 1.6.0
