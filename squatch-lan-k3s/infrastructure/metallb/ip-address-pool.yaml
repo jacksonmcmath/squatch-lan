@@ -1,0 +1,17 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: services
+  namespace: metallb
+spec:
+  addresses:
+    - 10.30.30.2-10.30.30.199
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: vpn
+  namespace: metallb
+spec:
+  addresses:
+    - 10.0.90.2-10.0.90.199

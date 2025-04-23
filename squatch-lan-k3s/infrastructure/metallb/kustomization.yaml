@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - releaseName: metallb
+    namespace: metallb
+    name: metallb
+    repo: https://metallb.github.io/metallb
+    version: 0.14.9
+    valuesFile: values.yaml
+
+resources:
+  - ip-address-pool.yaml
+  - l2-advirtisement.yaml
