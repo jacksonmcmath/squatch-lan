@@ -13,4 +13,4 @@ spec:
         - name: op-connect
           port: 8080
   tls:
-    certResolver: default
+    secretName: op-connect-tls
