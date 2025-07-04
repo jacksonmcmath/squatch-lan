@@ -1,0 +1,28 @@
+machine:
+  install:
+    image: ${installer_image}
+    extraKernelArgs:
+%{ for item in extra_kernel_args ~}
+      - ${item}
+%{ endfor ~}
+  network:
+    hostname: ${hostname}
+    interfaces:
+      - interface: eth0
+        dhcp: true
+  kubelet:
+    clusterDNS:
+      - 172.20.0.10
+    nodeIP:
+      validSubnets:
+        - ${node_ip}/32
+
+---
+apiVersion: v1alpha1
+kind: ExtensionServiceConfig
+name: nut-client
+configFiles:
+  - content: |-
+        MONITOR ups@jrm-nas-01.local.squatch.dev 1 monuser secret slave
+        SHUTDOWNCMD "/sbin/poweroff"
+    mountPath: /usr/local/etc/nut/upsmon.conf

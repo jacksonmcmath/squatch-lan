@@ -1,0 +1,49 @@
+machine:
+  install:
+    image: ${installer_image}
+    extraKernelArgs:
+%{ for item in extra_kernel_args ~}
+      - ${item}
+%{ endfor ~}
+  network:
+    hostname: ${hostname}
+    interfaces:
+      - interface: eth0
+        dhcp: true
+        vip:
+          ip: ${vip}
+  kubelet:
+    clusterDNS:
+      - 172.20.0.10
+    nodeIP:
+      validSubnets:
+        - ${node_ip}/32
+
+cluster:
+  network:
+    cni:
+      name: none
+    podSubnets:
+      - 172.18.0.0/16
+    serviceSubnets:
+      - 172.20.0.0/16
+  proxy:
+    disabled: true
+  # https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/#prerequisites
+  extraManifests:
+    - https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml
+    - https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml
+    - https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml
+    - https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml
+    - https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml
+    - https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml
+
+---
+apiVersion: v1alpha1
+kind: ExtensionServiceConfig
+name: nut-client
+configFiles:
+  - content: |-
+        MONITOR ups@jrm-nas-01.local.squatch.dev 1 monuser secret slave
+        SHUTDOWNCMD "/sbin/poweroff"
+    mountPath: /usr/local/etc/nut/upsmon.conf
