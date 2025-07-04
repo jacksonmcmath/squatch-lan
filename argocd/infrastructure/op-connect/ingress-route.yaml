@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: op-connect
+  namespace: op-connect
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`op-connect.kube.local.squatch.dev`)
+      services:
+        - name: op-connect
+          port: 8080
+  tls:
+    secretName: op-connect-tls

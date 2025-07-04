@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: homarr
+  namespace: homarr
+spec:
+  secretName: homarr-tls
+  dnsNames:
+    - servarr.kube.local.squatch.dev
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: servarr.kube.local.squatch.dev

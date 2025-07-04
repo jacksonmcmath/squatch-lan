@@ -1,0 +1,5 @@
+connect:
+  applicationName: op-connect
+  host: op-connect
+  credentialsName: op-credentials
+  credentialsKey: 1password-credentials.json.b64

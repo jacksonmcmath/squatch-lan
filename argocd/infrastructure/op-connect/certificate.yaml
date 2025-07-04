@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: op-connect
+  namespace: op-connect
+spec:
+  secretName: op-connect-tls
+  dnsNames:
+    - op-connect.kube.local.squatch.dev
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: op-connect.kube.local.squatch.dev

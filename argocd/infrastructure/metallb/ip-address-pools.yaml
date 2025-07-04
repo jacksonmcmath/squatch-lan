@@ -1,0 +1,80 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Border Services - Internal
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.128.8.0-10.128.15.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Border Services - External
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.128.40.0-10.128.47.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Gateways - Inbound
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.128.72.0-10.128.79.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Gateways - Outbound
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.128.104.0-10.128.111.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Management
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.129.8.0-10.129.15.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Management Applications
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.129.72.0-10.129.79.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Internal Applications
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.129.136.0-10.129.143.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: Public Applications
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.129.190.0-10.129.197.255
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: IoT
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.130.144.0-10.130.159.255
