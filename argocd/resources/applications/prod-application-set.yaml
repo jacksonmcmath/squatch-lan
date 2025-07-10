@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: prod-application-set
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/jacksonmcmath/squatch-lan.git
+        revision: HEAD
+        directories:
+          - path: argocd/applications/prod/**
+  template:
+    metadata:
+      name: "{{ normalize .path.basename }}"
+      namespace: argocd
+    spec:
+      project: prod
+      source:
+        repoURL: https://github.com/jacksonmcmath/squatch-lan.git
+        targetRevision: HEAD
+        path: "{{ .path.path }}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: prod-{{ normalize .path.basename }}
+      kustomize:
+        namePrefix: prod-
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

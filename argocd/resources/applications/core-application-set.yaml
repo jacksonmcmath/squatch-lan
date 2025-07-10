@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: core-application-set
+  namespace: argocd
+spec:
+  # goTemplate: true
+  # goTemplateOptions: ["missingkey=error"]
+  generators:
+    - merge:
+        mergeKeys:
+          - values.selector # will not work with go template
+        generators:
+          - git:
+              repoURL: https://github.com/jacksonmcmath/squatch-lan.git
+              revision: HEAD
+              directories:
+                - path: argocd/applications/core/*
+              values:
+                selector: "{{ path.basename }}"
+                namespace: "{{ path.basenameNormalized }}"
+          - list:
+              elements:
+                - values:
+                    selector: cilium
+                    namespace: kube-system
+                - values:
+                    selector: external-snapshotter
+                    namespace: kube-system
+  template:
+    metadata:
+      name: "{{ path.basenameNormalized }}"
+      namespace: argocd
+    spec:
+      project: core
+      source:
+        repoURL: https://github.com/jacksonmcmath/squatch-lan.git
+        targetRevision: HEAD
+        path: "{{ path }}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{ values.namespace }}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

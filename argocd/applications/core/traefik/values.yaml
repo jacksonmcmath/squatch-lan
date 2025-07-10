@@ -1,0 +1,94 @@
+providers:
+  kubernetesIngress:
+    enabled: false
+  kubernetesGateway:
+    enabled: true
+
+gateway:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+  listeners:
+    web:
+      port: 8080
+      protocol: HTTP
+      hostname: "*.kube.squatch.dev"
+      namespacePolicy: All
+    websecure:
+      port: 8443
+      protocol: HTTPS
+      hostname: "*.kube.squatch.dev"
+      namespacePolicy: All
+      certificateRefs:
+        - name: traefik-tls
+    traefik:
+      port: 9000
+      protocol: HTTPS
+      hostname: "*.kube.squatch.dev"
+      certificateRefs:
+        - name: traefik-tls
+    metrics:
+      port: 9100
+      protocol: HTTPS
+      hostname: "*.kube.squatch.dev"
+      certificateRefs:
+        - name: traefik-tls
+
+ports:
+  web:
+    port: 8080
+    exposedPort: 80
+    expose:
+      default: true
+    redirections:
+      entryPoint:
+        to: websecure
+        scheme: https
+        permanent: true
+  websecure:
+    asDefault: true
+    port: 8443
+    exposedPort: 443
+    expose:
+      default: true
+  traefik:
+    port: 9000
+    exposedPort: 9000
+    expose:
+      internal: true
+  metrics:
+    port: 9100
+    exposedPort: 9100
+    expose:
+      internal: true
+
+service:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    lbipam.cilium.io/ips: "10.129.192.8"
+  additionalServices:
+    internal:
+      type: LoadBalancer
+      annotations:
+        lbipam.cilium.io/ips: "10.129.128.8"
+
+logs:
+  general:
+    format: json
+    level: INFO
+  access:
+    enabled: true
+    addInternals: true
+    format: json
+
+accessLog:
+  enabled: true
+
+metrics:
+  otlp:
+    enabled: true
+
+tracing:
+  otlp:
+    enabled: true
