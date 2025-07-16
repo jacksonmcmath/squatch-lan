@@ -4,7 +4,6 @@
   become: false
   gather_facts: false
   roles:
-    - role: ssh
     - role: create_group
       group:
         name: media
@@ -57,7 +56,6 @@
           # deb https://enterprise.proxmox.com/debian/pve bookworm pve-enterprise
 
         dest: /etc/apt/sources.list.d/pve-enterprise.list
-        create: true
         owner: root
         group: root
         mode: u=rw,g=r,o=r

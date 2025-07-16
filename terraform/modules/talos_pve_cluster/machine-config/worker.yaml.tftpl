@@ -2,14 +2,33 @@ machine:
   install:
     image: ${installer_image}
     extraKernelArgs:
-%{ for item in extra_kernel_args ~}
+      %{~ for item in extra_kernel_args }
       - ${item}
-%{ endfor ~}
+      %{~ endfor }
+  nodeLabels:
+    node-role.kubernetes.io/worker: ""
+    %{~ for key, value in nodeLabels }
+    ${k}: ${v}
+    %{~ endfor }
+  nodeAnnotations:
+    %{~ for key, value in nodeAnnotations }
+    ${k}: ${v}
+    %{~ endfor }
+  nodeTaints:
+    %{~ for key, value in nodeTaints }
+    ${k}: ${v}
+    %{~ endfor }
   network:
     hostname: ${hostname}
     interfaces:
       - interface: eth0
         dhcp: true
+      - interface: eth1
+        addresses:
+          - 10.129.33.${split(".", node_ip)[3]}/32
+        routes:
+          - network: 10.129.32.0/19
+        mtu: 9000
   kubelet:
     clusterDNS:
       - 172.20.0.10

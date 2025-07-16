@@ -12,6 +12,7 @@ spec:
           - LoadBalancerIP
       selector:
         matchExpressions:
+          # Advertise all LoadBalancer services
           - { key: unused, operator: NotIn, values: [ unused ] }
       attributes:
         communities:

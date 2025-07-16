@@ -24,15 +24,18 @@ variable "cluster" {
 variable "nodes" {
   description = "Configuration for cluster nodes"
   type = map(object({
-    pve_node     = string
-    machine_type = string
-    storage_pool = optional(string, "local-zfs")
-    vm_id        = number
-    ip           = string
-    mac          = string
-    cores        = number
-    memory       = number
-    igpu         = optional(bool, false)
+    pve_node        = string
+    machine_type    = string
+    storage_pool    = optional(string, "local-zfs")
+    vm_id           = number
+    ip              = string
+    mac             = string
+    cores           = number
+    memory          = number
+    igpu            = optional(bool, false)
+    nodeLabels      = optional(map(string), {})
+    nodeAnnotations = optional(map(string), {})
+    nodeTaints      = optional(map(string), {})
   }))
 }
 

@@ -1,9 +1,8 @@
 apiVersion: cilium.io/v2alpha1
 kind: CiliumBGPPeerConfig
 metadata:
-  name: cilium-peer
+  name: unifi
 spec:
-  authSecretRef: bgp-auth-secret
   gracefulRestart:
     enabled: true
     restartTimeSeconds: 15
