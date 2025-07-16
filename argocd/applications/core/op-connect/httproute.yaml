@@ -6,8 +6,11 @@ metadata:
 spec:
   parentRefs:
     - name: traefik-gateway
+      namespace: traefik
+
   hostnames:
     - op-connect.kube.squatch.dev
+
   rules:
     - matches:
         - path:

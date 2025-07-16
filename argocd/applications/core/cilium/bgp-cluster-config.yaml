@@ -3,15 +3,12 @@ kind: CiliumBGPClusterConfig
 metadata:
   name: cilium-bgp
 spec:
-  nodeSelector:
-    matchLabels:
-      rack: rack0
   bgpInstances:
     - name: cilium-bgp
-      localASN: 64513
+      localASN: 65001
       peers:
-        - name: router
-          peerASN: 64512
-      peerAddress: 10.129.0.1
-      peerConfigRef:
-        name: cilium-peer
+        - name: unifi
+          peerASN: 65000
+          peerAddress: 10.129.0.1
+          peerConfigRef:
+            name: unifi

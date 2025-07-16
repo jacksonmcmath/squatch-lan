@@ -23,6 +23,7 @@ provider "proxmox" {
   ssh {
     agent    = true
     username = var.proxmox.username
+    private_key = file("~/.ssh/root_ed25519")
   }
 }
 
