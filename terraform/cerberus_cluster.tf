@@ -5,12 +5,12 @@ module "talos_pve_cluster" {
     name          = "pve-cluster-01-cerberus"
     endpoint      = "10.129.8.1"
     talos_version = "v1.10.3"
-    pve_nodes     = ["pve-01-yosemite"] # , "pve-02-denali", "pve-03-acadia"]
   }
 
   image = {
-    version     = "v1.10.3"
-    secure_boot = false
+    pve_storage_pool = "images"
+    version          = "v1.10.3"
+    secure_boot      = false
     extra_kernel_args = [
       "-console",
       "console=tty0",
@@ -35,7 +35,7 @@ module "talos_pve_cluster" {
   }
 
   argocd = {
-    version = "8.1.2"
+    version = "8.2.5"
     values  = file("${path.module}/../argocd/applications/core/argocd/values.yaml")
   }
 
@@ -44,89 +44,120 @@ module "talos_pve_cluster" {
       pve_node     = "pve-01-yosemite"
       machine_type = "controlplane"
       vm_id        = 8801
+      storage_pool = "tank"
       ip           = "10.129.8.101"
       mac          = "BC:24:11:88:C8:01"
       cores        = 4
-      memory       = 4096
+      memory       = 8192
     }
-    # "cerberus-control-plane-02" = {
-    #   pve_node     = "pve-02-denali"
-    #   machine_type = "controlplane"
-    #   vm_id        = 8802
-    #   ip           = "10.129.8.102"
-    #   mac          = "BC:24:11:88:C8:02"
-    #   cores        = 4
-    #   memory       = 4096
-    # }
-    # "cerberus-control-plane-03" = {
-    #   pve_node     = "pve-03-acadia"
-    #   machine_type = "controlplane"
-    #   vm_id        = 8803
-    #   ip           = "10.129.8.103"
-    #   mac          = "BC:24:11:88:C8:03"
-    #   cores        = 4
-    #   memory       = 4096
-    # }
+    "cerberus-control-plane-02" = {
+      pve_node     = "pve-02-denali"
+      machine_type = "controlplane"
+      vm_id        = 8802
+      storage_pool = "tank"
+      ip           = "10.129.8.102"
+      mac          = "BC:24:11:88:C8:02"
+      cores        = 4
+      memory       = 8192
+    }
+    "cerberus-control-plane-03" = {
+      pve_node     = "pve-03-acadia"
+      machine_type = "controlplane"
+      vm_id        = 8803
+      storage_pool = "tank"
+      ip           = "10.129.8.103"
+      mac          = "BC:24:11:88:C8:03"
+      cores        = 4
+      memory       = 8192
+    }
     "cerberus-worker-01" = {
       pve_node     = "pve-01-yosemite"
       machine_type = "worker"
       vm_id        = 8811
+      storage_pool = "tank"
       ip           = "10.129.8.111"
       mac          = "BC:24:11:88:F8:01"
       cores        = 2
       memory       = 8192
       igpu         = false
+      nodeLabels = {
+        "node.kubernetes.io/instance-type" = "lg"
+      }
     }
-    # "cerberus-worker-02" = {
-    #   pve_node     = "pve-02-denali"
-    #   machine_type = "worker"
-    #   vm_id        = 8812
-    #   ip           = "10.129.8.112"
-    #   mac          = "BC:24:11:88:F8:02"
-    #   cores        = 4
-    #   memory       = 16384
-    #   igpu         = true
-    # }
-    # "cerberus-worker-03" = {
-    #   pve_node     = "pve-03-acadia"
-    #   machine_type = "worker"
-    #   vm_id        = 8813
-    #   ip           = "10.129.8.113"
-    #   mac          = "BC:24:11:88:F8:03"
-    #   cores        = 2
-    #   memory       = 8192
-    #   igpu         = false
-    # }
-    "cerberus-worker-04" = {
+    "cerberus-worker-02" = {
       pve_node     = "pve-01-yosemite"
       machine_type = "worker"
+      vm_id        = 8812
+      storage_pool = "tank"
+      ip           = "10.129.8.112"
+      mac          = "BC:24:11:88:F8:02"
+      cores        = 4
+      memory       = 16384
+      igpu         = false
+      nodeLabels = {
+        "node.kubernetes.io/instance-type" = "xl"
+        # "node-role.kubernetes.io/gpu" = "Intel UHD Graphics 630"
+      }
+
+    }
+    "cerberus-worker-03" = {
+      pve_node     = "pve-02-denali"
+      machine_type = "worker"
+      vm_id        = 8813
+      storage_pool = "tank"
+      ip           = "10.129.8.113"
+      mac          = "BC:24:11:88:F8:03"
+      cores        = 2
+      memory       = 8192
+      igpu         = false
+      nodeLabels = {
+        "node.kubernetes.io/instance-type" = "lg"
+      }
+    }
+    "cerberus-worker-04" = {
+      pve_node     = "pve-02-denali"
+      machine_type = "worker"
       vm_id        = 8814
+      storage_pool = "tank"
       ip           = "10.129.8.114"
       mac          = "BC:24:11:88:F8:04"
       cores        = 4
       memory       = 16384
-      igpu         = true
+      igpu         = false
+      nodeLabels = {
+        "node.kubernetes.io/instance-type" = "xl"
+        # "node-role.kubernetes.io/gpu" = "Intel UHD Graphics 630"
+      }
     }
-    # "cerberus-worker-05" = {
-    #   pve_node     = "pve-02-denali"
-    #   machine_type = "worker"
-    #   vm_id        = 8815
-    #   ip           = "10.129.8.115"
-    #   mac          = "BC:24:11:88:F8:05"
-    #   cores        = 2
-    #   memory       = 8192
-    #   igpu         = false
-    # }
-    # "cerberus-worker-06" = {
-    #   pve_node     = "pve-03-acadia"
-    #   machine_type = "worker"
-    #   vm_id        = 8816
-    #   ip           = "10.129.8.116"
-    #   mac          = "BC:24:11:88:F8:06"
-    #   cores        = 4
-    #   memory       = 16384
-    #   igpu         = true
-    # }
+    "cerberus-worker-05" = {
+      pve_node     = "pve-03-acadia"
+      machine_type = "worker"
+      vm_id        = 8815
+      storage_pool = "tank"
+      ip           = "10.129.8.115"
+      mac          = "BC:24:11:88:F8:05"
+      cores        = 2
+      memory       = 8192
+      igpu         = false
+      nodeLabels = {
+        "node.kubernetes.io/instance-type" = "lg"
+      }
+    }
+    "cerberus-worker-06" = {
+      pve_node     = "pve-03-acadia"
+      machine_type = "worker"
+      vm_id        = 8816
+      storage_pool = "tank"
+      ip           = "10.129.8.116"
+      mac          = "BC:24:11:88:F8:06"
+      cores        = 4
+      memory       = 16384
+      igpu         = false
+      nodeLabels = {
+        "node.kubernetes.io/instance-type" = "xl"
+        # "node-role.kubernetes.io/gpu" = "Intel UHD Graphics 630"
+      }
+    }
   }
 }
 

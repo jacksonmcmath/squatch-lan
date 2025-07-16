@@ -6,8 +6,11 @@ metadata:
 spec:
   parentRefs:
     - name: traefik-gateway
+      namespace: traefik
+
   hostnames:
     - argocd.kube.squatch.dev
+
   rules:
     - matches:
         - path:
@@ -15,4 +18,4 @@ spec:
             value: /
       backendRefs:
         - name: argocd-server
-          port: 443
+          port: 80

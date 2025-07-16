@@ -17,9 +17,7 @@ data "talos_image_factory_urls" "this" {
 }
 
 resource "proxmox_virtual_environment_download_file" "this" {
-  for_each = toset(var.cluster.pve_nodes)
-
-  node_name    = each.key
+  node_name    = var.nodes[keys(var.nodes)[0]].pve_node
   content_type = "iso"
   datastore_id = var.image.pve_storage_pool
 

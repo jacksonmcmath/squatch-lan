@@ -35,13 +35,13 @@ operator:
 rollOutCiliumPods: true
 
 # L2 announcements https://docs.cilium.io/en/stable/network/l2-announcements/
-l2announcements:
-  enabled: true
+# l2announcements:
+#   enabled: true
 
 # Increase rate limit when doing L2 announcements
-k8sClientRateLimit:
-  qps: 32
-  burst: 64
+# k8sClientRateLimit:
+#   qps: 32
+#   burst: 64
 
 externalIPs:
   enabled: true
@@ -64,5 +64,5 @@ hubble:
     enabled: true
     rollOutPods: true
 
-# debug:
-#   enabled: true
+debug:
+  enabled: true

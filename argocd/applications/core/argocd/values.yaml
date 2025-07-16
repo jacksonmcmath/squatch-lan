@@ -1,7 +1,10 @@
 applicationSet:
   extraArgs:
     - --enable-new-git-file-globbing
+
 configs:
   cm:
     kustomize.buildOptions: "--enable-helm"
     statusbadge.enabled: true
+  params:
+    server.insecure: true

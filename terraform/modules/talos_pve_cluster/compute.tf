@@ -5,8 +5,11 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   name        = each.key
   description = "${each.value.machine_type == "controlplane" ? "Talos Control Plane" : "Talos Worker"} (${var.image.version})"
-  tags        = each.value.machine_type == "controlplane" ? ["k8s", "control-plane"] : ["k8s", "worker"]
-  vm_id       = each.value.vm_id
+  tags = concat(
+    each.value.machine_type == "controlplane" ? ["k8s", "control-plane"] : ["k8s", "worker"],
+    each.value.igpu ? ["igpu"] : []
+  )
+  vm_id = each.value.vm_id
 
   memory {
     dedicated = each.value.memory
@@ -45,12 +48,19 @@ resource "proxmox_virtual_environment_vm" "this" {
     discard      = "on"
     iothread     = true
     ssd          = true
-    file_id      = proxmox_virtual_environment_download_file.this[each.value.pve_node].id
+    file_id      = proxmox_virtual_environment_download_file.this.id
   }
 
   network_device {
     bridge      = "vmbr0"
     mac_address = each.value.mac
+  }
+
+  dynamic "network_device" {
+    for_each = each.value.machine_type == "worker" ? [1] : []
+    content {
+      bridge = "vmbr1"
+    }
   }
 
   serial_device {

@@ -1,4 +1,6 @@
 providers:
+  kubernetesCRD:
+    enabled: false
   kubernetesIngress:
     enabled: false
   kubernetesGateway:
@@ -7,30 +9,50 @@ providers:
 gateway:
   enabled: true
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-production
   listeners:
     web:
       port: 8080
+      hostname: "*.squatch.dev"
       protocol: HTTP
-      hostname: "*.kube.squatch.dev"
-      namespacePolicy: All
+      namespacePolicy:
+        from: All
     websecure:
       port: 8443
+      hostname: "*.squatch.dev"
       protocol: HTTPS
-      hostname: "*.kube.squatch.dev"
-      namespacePolicy: All
+      namespacePolicy:
+        from: All
       certificateRefs:
-        - name: traefik-tls
+        - name: squatch-tls
+    web-kube:
+      port: 8080
+      hostname: "*.kube.squatch.dev"
+      protocol: HTTP
+      namespacePolicy:
+        from: All
+    websecure-kube:
+      port: 8443
+      hostname: "*.kube.squatch.dev"
+      protocol: HTTPS
+      namespacePolicy:
+        from: All
+      certificateRefs:
+        - name: kube-squatch-tls
     traefik:
       port: 9000
+      hostname: "traefik.kube.squatch.dev"
       protocol: HTTPS
-      hostname: "*.kube.squatch.dev"
+      namespacePolicy:
+        from: All
       certificateRefs:
         - name: traefik-tls
     metrics:
       port: 9100
+      hostname: "traefik.kube.squatch.dev"
       protocol: HTTPS
-      hostname: "*.kube.squatch.dev"
+      namespacePolicy:
+        from: All
       certificateRefs:
         - name: traefik-tls
 
@@ -40,6 +62,7 @@ ports:
     exposedPort: 80
     expose:
       default: true
+      internal: true
     redirections:
       entryPoint:
         to: websecure
@@ -51,6 +74,7 @@ ports:
     exposedPort: 443
     expose:
       default: true
+      internal: true
   traefik:
     port: 9000
     exposedPort: 9000
@@ -66,21 +90,23 @@ service:
   enabled: true
   type: LoadBalancer
   annotations:
-    lbipam.cilium.io/ips: "10.129.192.8"
+    lbipam.cilium.io/ips: "10.129.192.2"
   additionalServices:
     internal:
       type: LoadBalancer
       annotations:
-        lbipam.cilium.io/ips: "10.129.128.8"
+        lbipam.cilium.io/ips: "10.129.128.2"
+api:
+  dashboard: true
 
 logs:
   general:
-    format: json
-    level: INFO
+    # format: json
+    level: DEBUG
   access:
     enabled: true
     addInternals: true
-    format: json
+    # format: json
 
 accessLog:
   enabled: true

@@ -1,19 +1,21 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: traefik-httproute
-  namespace: traefik
+  name: op-connect-route
+  namespace: op-connect
 spec:
   parentRefs:
     - name: traefik-gateway
       namespace: traefik
+
   hostnames:
-    - traefik.kube.squatch.dev
+    - op-connect.kube.squatch.dev
+
   rules:
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: traefik
-          port: 9000
+        - name: op-connect
+          port: 8080

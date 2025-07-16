@@ -11,4 +11,4 @@ helmCharts:
 
 resources:
   - credentials-secret.yaml
-  - httproute.yaml
+  - http-route.yaml

@@ -10,4 +10,8 @@ helmCharts:
     valuesFile: values.yaml
 
 resources:
+  - bgp-advertisement.yaml
+  - bgp-peer-config.yaml
+  - bgp-cluster-config.yaml
   - ip-pools.yaml
+  - http-route.yaml

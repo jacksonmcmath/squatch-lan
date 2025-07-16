@@ -1,9 +1,9 @@
 - name: Install user's shell
   when: >
     user.shell is defined and
-    '/sh' not in user.shell and
-    '/bash' not in user.shell and
-    '/nologin' not in user.shell
+    '/sh' != user.shell and
+    '/bash' != user.shell and
+    '/nologin' != user.shell
   ansible.builtin.package:
     name: "{{ user.shell | split('/') | last }}"
     state: present

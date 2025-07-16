@@ -27,6 +27,9 @@ spec:
                 - values:
                     selector: external-snapshotter
                     namespace: kube-system
+                - values:
+                    selector: csi-driver-nfs
+                    namespace: kube-system
   template:
     metadata:
       name: "{{ path.basenameNormalized }}"
