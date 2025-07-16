@@ -1,19 +1,45 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: traefik-httproute
+  name: traefik-dashboard-http
   namespace: traefik
 spec:
   parentRefs:
     - name: traefik-gateway
       namespace: traefik
+
   hostnames:
     - traefik.kube.squatch.dev
+
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: traefik-dashboard-https
+  namespace: traefik
+spec:
+  parentRefs:
+    - name: traefik-gateway
+      namespace: traefik
+
+  hostnames:
+    - traefik.kube.squatch.dev
+
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /dashboard
+        - path:
+            type: PathPrefix
+            value: /api
+
       backendRefs:
-        - name: traefik
-          port: 9000
+        - name: api@internal
+          group: traefik.io
+          kind: TraefikService

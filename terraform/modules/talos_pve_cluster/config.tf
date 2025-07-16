@@ -24,6 +24,9 @@ data "talos_machine_configuration" "this" {
       extra_kernel_args = var.image.extra_kernel_args
       node_ip           = each.value.ip
       vip               = var.cluster.endpoint
+      nodeLabels        = each.value.nodeLabels
+      nodeAnnotations   = each.value.nodeAnnotations
+      nodeTaints        = each.value.nodeTaints
     })
     ] : [
     templatefile("${path.module}/machine-config/worker.yaml.tftpl", {
@@ -31,6 +34,9 @@ data "talos_machine_configuration" "this" {
       installer_image   = var.image.secure_boot ? data.talos_image_factory_urls.this.urls.installer_secureboot : data.talos_image_factory_urls.this.urls.installer
       extra_kernel_args = var.image.extra_kernel_args
       node_ip           = each.value.ip
+      nodeLabels        = each.value.nodeLabels
+      nodeAnnotations   = each.value.nodeAnnotations
+      nodeTaints        = each.value.nodeTaints
     })
   ]
 }
@@ -91,10 +97,10 @@ resource "helm_release" "cilium" {
   chart      = "cilium"
   version    = var.cilium.version
 
-  namespace  = "kube-system"
+  namespace        = "kube-system"
   create_namespace = true
-  values     = [var.cilium.values]
-  wait       = false
+  values           = [var.cilium.values]
+  wait             = false
 
   depends_on = [
     talos_cluster_kubeconfig.this,
