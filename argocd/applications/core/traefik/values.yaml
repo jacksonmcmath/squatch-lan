@@ -1,6 +1,6 @@
 providers:
   kubernetesCRD:
-    enabled: false
+    enabled: true
   kubernetesIngress:
     enabled: false
   kubernetesGateway:
@@ -24,7 +24,9 @@ gateway:
       namespacePolicy:
         from: All
       certificateRefs:
-        - name: squatch-tls
+        - group: ""
+          kind: Secret
+          name: squatch-tls
     web-kube:
       port: 8080
       hostname: "*.kube.squatch.dev"
@@ -38,7 +40,9 @@ gateway:
       namespacePolicy:
         from: All
       certificateRefs:
-        - name: kube-squatch-tls
+        - group: ""
+          kind: Secret
+          name: kube-squatch-tls
     traefik:
       port: 9000
       hostname: "traefik.kube.squatch.dev"
@@ -46,7 +50,9 @@ gateway:
       namespacePolicy:
         from: All
       certificateRefs:
-        - name: traefik-tls
+        - group: ""
+          kind: Secret
+          name: traefik-tls
     metrics:
       port: 9100
       hostname: "traefik.kube.squatch.dev"
@@ -54,7 +60,9 @@ gateway:
       namespacePolicy:
         from: All
       certificateRefs:
-        - name: traefik-tls
+        - group: ""
+          kind: Secret
+          name: traefik-tls
 
 ports:
   web:

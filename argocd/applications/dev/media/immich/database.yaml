@@ -1,0 +1,53 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: immich-db-cluster
+spec:
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:17.5-0.4.3@sha256:acebb38ca309938bc05ce268b019c98aa718cb554dd54e4443654d9d00a0d498 
+  instances: 1
+
+  postgresql:
+    shared_preload_libraries:
+      - 'vchord.so'
+
+  managed:
+    roles:
+      - name: immich
+        ensure: present
+        superuser: true
+        login: true
+        passwordSecret:
+          name: dev-immich-database-user
+
+  # bootstrap:
+  #   initdb:
+  #     database: immich
+  #     owner: immich
+  #     secret:
+  #       name: immich-postgres-user
+  #     postInitSQL:
+  #       - CREATE EXTENSION IF NOT EXISTS "vectors";
+  #       - CREATE EXTENSION IF NOT EXISTS "cube" CASCADE;
+  #       - CREATE EXTENSION IF NOT EXISTS "earthdistance" CASCADE;
+
+  storage:
+    storageClass: csi-ceph-rbd
+    size: 8Gi
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: immich-db
+spec:
+  name: immich
+  owner: immich
+  cluster:
+    name: dev-immich-db-cluster
+  extensions:
+    - name: vchord
+      ensure: present
+      version: 0.4.3
+    - name: cube
+      ensure: present
+    - name: earthdistance
+      ensure: present
