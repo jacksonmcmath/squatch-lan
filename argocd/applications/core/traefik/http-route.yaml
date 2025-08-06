@@ -5,7 +5,9 @@ metadata:
   namespace: traefik
 spec:
   parentRefs:
-    - name: traefik-gateway
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: traefik-gateway
       namespace: traefik
 
   hostnames:
@@ -20,24 +22,27 @@ spec:
             type: PathPrefix
             value: /api
       backendRefs:
-        - name: api@internal
-          group: traefik.io
+        - group: traefik.io
           kind: TraefikService
-
+          name: api@internal
+          weight: 1
+          
     - matches:
         - path:
             type: PathPrefix
             value: /ping
       backendRefs:
-        - name: ping@internal
-          group: traefik.io
+        - group: traefik.io
           kind: TraefikService
+          name: ping@internal
+          weight: 1
 
     - matches:
         - path:
             type: PathPrefix
             value: /metrics
       backendRefs:
-        - name: prometheus@internal
-          group: traefik.io
+        - group: traefik.io
           kind: TraefikService
+          name: prometheus@internal
+          weight: 1

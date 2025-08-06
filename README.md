@@ -40,7 +40,7 @@ These applications are the various workloads running on the cluster.
 ## TODO
 
 - Rapsberry Pi Integrations
-  - NUT server, extra DNS node, WOL? PBS?, gotify
+  - NUT server, extra DNS node, WOL?, gotify
 - OCI Integrations
   - reverse proxy, wireguard, uptime, gotify, PVE quorum device?
   - ansible roles

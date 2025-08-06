@@ -5,7 +5,9 @@ metadata:
   namespace: kubernetes-dashboard
 spec:
   parentRefs:
-    - name: traefik-gateway
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: traefik-gateway
       namespace: traefik
 
   hostnames:
@@ -17,5 +19,8 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: kubernetes-dashboard-kong-proxy
+        - group: ""
+          kind: Service
+          name: kubernetes-dashboard-kong-proxy
           port: 80
+          weight: 1

@@ -1,0 +1,31 @@
+env:
+  REDIS_HOSTNAME: dev-immich-redis-master.dev-immich.svc
+  DB_HOSTNAME: dev-immich-db-cluster-rw.dev-immich.svc
+  DB_USERNAME:
+    secretKeyRef:
+      name: dev-immich-database-user
+      key: username
+  DB_PASSWORD:
+    secretKeyRef:
+      name: dev-immich-database-user
+      key: password
+  DB_VECTOR_EXTENSION: vectorchord
+
+image:
+  tag: v1.137.3
+
+immich:
+  metrics:
+    enabled: false
+  persistence:
+    library:
+      existingClaim: immich-library-pvc
+
+redis:
+  enabled: true
+
+machine-learning:
+  persistence:
+    cache:
+      type: pvc
+      storageClass: csi-ceph-cephfs

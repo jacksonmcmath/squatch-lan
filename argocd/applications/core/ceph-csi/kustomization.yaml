@@ -17,4 +17,5 @@ helmCharts:
 
 resources:
   - namespace.yaml
+  - credentials-secret.yaml
   - storage-class.yaml

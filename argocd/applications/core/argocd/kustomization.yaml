@@ -6,7 +6,7 @@ helmCharts:
     namespace: argocd
     name: argo-cd
     repo: https://argoproj.github.io/argo-helm
-    version: 8.2.5
+    version: 8.3.0
     valuesFile: values.yaml
 
 resources:
