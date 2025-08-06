@@ -1,0 +1,3 @@
+envSecrets:
+  dbCredentials:
+    existingSecret: "dev-db-secret"

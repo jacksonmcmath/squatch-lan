@@ -14,14 +14,14 @@ spec:
           - path: argocd/applications/prod/**
   template:
     metadata:
-      name: "{{ normalize .path.basename }}"
+      name: prod-{{ normalize .path.basename }}
       namespace: argocd
     spec:
       project: prod
       source:
         repoURL: https://github.com/jacksonmcmath/squatch-lan.git
-        targetRevision: HEAD
         path: "{{ .path.path }}"
+        targetRevision: HEAD
       destination:
         server: https://kubernetes.default.svc
         namespace: prod-{{ normalize .path.basename }}

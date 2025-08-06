@@ -1,0 +1,8 @@
+env:
+  TZ: "America/New_York"
+
+persistence:
+  homarrDatabase:
+    enabled: true
+    storageClassName: csi-cephfs
+    size: 1Gi

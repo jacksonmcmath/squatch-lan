@@ -38,8 +38,8 @@ spec:
       project: core
       source:
         repoURL: https://github.com/jacksonmcmath/squatch-lan.git
-        targetRevision: HEAD
         path: "{{ path }}"
+        targetRevision: HEAD
       destination:
         server: https://kubernetes.default.svc
         namespace: "{{ values.namespace }}"
