@@ -1,18 +1,20 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: csi-rbd
+   name: csi-ceph-rbd
+   annotations:
+     storageclass.kubernetes.io/is-default-class: "true"
 provisioner: rbd.csi.ceph.com
 parameters:
-   clusterID: b9127830-b0cc-4e34-aa47-9d1a2e9949a8
+   clusterID: 19887d90-ab68-4b40-bcaf-61dbd50fb9ce
    pool: kubernetes
    imageFeatures: layering
    csi.storage.k8s.io/provisioner-secret-name: csi-rbd-secret
-   csi.storage.k8s.io/provisioner-secret-namespace: default
+   csi.storage.k8s.io/provisioner-secret-namespace: ceph-csi-rbd
    csi.storage.k8s.io/controller-expand-secret-name: csi-rbd-secret
-   csi.storage.k8s.io/controller-expand-secret-namespace: default
+   csi.storage.k8s.io/controller-expand-secret-namespace: ceph-csi-rbd
    csi.storage.k8s.io/node-stage-secret-name: csi-rbd-secret
-   csi.storage.k8s.io/node-stage-secret-namespace: default
+   csi.storage.k8s.io/node-stage-secret-namespace: ceph-csi-rbd
 reclaimPolicy: Delete
 allowVolumeExpansion: true
 mountOptions:
@@ -21,16 +23,16 @@ mountOptions:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: csi-cephfs
+  name: csi-ceph-cephfs
 provisioner: cephfs.csi.ceph.com
 parameters:
-   clusterID: b9127830-b0cc-4e34-aa47-9d1a2e9949a8
+   clusterID: 19887d90-ab68-4b40-bcaf-61dbd50fb9ce
    fsName: kubernetes
    csi.storage.k8s.io/provisioner-secret-name: csi-cephfs-secret
-   csi.storage.k8s.io/provisioner-secret-namespace: default
+   csi.storage.k8s.io/provisioner-secret-namespace: ceph-csi-cephfs
    csi.storage.k8s.io/controller-expand-secret-name: csi-cephfs-secret
-   csi.storage.k8s.io/controller-expand-secret-namespace: default
+   csi.storage.k8s.io/controller-expand-secret-namespace: ceph-csi-cephfs
    csi.storage.k8s.io/node-stage-secret-name: csi-cephfs-secret
-   csi.storage.k8s.io/node-stage-secret-namespace: default
+   csi.storage.k8s.io/node-stage-secret-namespace: ceph-csi-cephfs
 reclaimPolicy: Delete
 allowVolumeExpansion: true

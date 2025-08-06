@@ -30,6 +30,9 @@ spec:
                 - values:
                     selector: csi-driver-nfs
                     namespace: kube-system
+                - values:
+                    selector: cnpg
+                    namespace: cnpg-system
   template:
     metadata:
       name: "{{ path.basenameNormalized }}"
@@ -38,8 +41,8 @@ spec:
       project: core
       source:
         repoURL: https://github.com/jacksonmcmath/squatch-lan.git
-        targetRevision: HEAD
         path: "{{ path }}"
+        targetRevision: HEAD
       destination:
         server: https://kubernetes.default.svc
         namespace: "{{ values.namespace }}"
@@ -49,3 +52,4 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true

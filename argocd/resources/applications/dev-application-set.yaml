@@ -11,22 +11,23 @@ spec:
         repoURL: https://github.com/jacksonmcmath/squatch-lan.git
         revision: HEAD
         directories:
-          - path: argocd/applications/dev/**
+          - path: argocd/applications/dev/*/*
   template:
     metadata:
-      name: "{{ normalize .path.basename }}"
+      name: dev-{{ normalize .path.basename }}
       namespace: argocd
     spec:
       project: dev
       source:
         repoURL: https://github.com/jacksonmcmath/squatch-lan.git
-        targetRevision: HEAD
         path: "{{ .path.path }}"
+        targetRevision: HEAD
+        kustomize:
+          namePrefix: dev-
+          namespace: dev-{{ normalize .path.basename }}
       destination:
         server: https://kubernetes.default.svc
         namespace: dev-{{ normalize .path.basename }}
-      kustomize:
-        namePrefix: dev-
       syncPolicy:
         automated:
           prune: true

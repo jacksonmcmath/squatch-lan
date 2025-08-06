@@ -1,0 +1,12 @@
+envSecrets:
+  dbCredentials:
+    existingSecret: "dev-db-secret"
+
+env:
+  TZ: "America/New_York"
+
+persistence:
+  homarrDatabase:
+    enabled: true
+    storageClassName: csi-ceph-cephfs
+    size: 1Gi
