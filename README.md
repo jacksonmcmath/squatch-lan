@@ -37,12 +37,31 @@ These applications are part of the essential infrastructure of the cluster.
 
 These applications are the various workloads running on the cluster.
 
+## IP Address Scheme
+
+| Subnet | VLAN | Name |
+| --- | ---: | --- |
+| `10.128.0.0/19` | 110 | Border Services - Internal |
+| `10.128.32.0/19` | 115 | Border Services - External |
+| `10.128.64.0/19` | 100 | Border Services - Inbound |
+| `10.128.96.0/19` | 105 | Border Services - Outbound |
+| `10.129.0.0/19` | 1 | Management |
+| `10.129.32.0/19` | 2 | Management (Non Routed) |
+| `10.129.64.0/19` | 5 | Management Applications |
+| `10.129.128.0/19` | 20 | Private Applications |
+| `10.129.192.0/19` | 25 | Public Applications |
+| `10.130.0.0/19` | 200 | Trusted Devices |
+| `10.130.32.0/19` | 210 | Work Devices |
+| `10.130.64.0/19` | 220 | Restricted Devices |
+| `10.130.96.0/19` | 230 | Guest |
+| `10.130.128.0/18` | 250 | IoT |
+
 ## TODO
 
 - Rapsberry Pi Integrations
   - NUT server, extra DNS node, WOL?, gotify
 - OCI Integrations
-  - reverse proxy, wireguard, uptime, gotify, PVE quorum device?
+  - reverse proxy, tailscale, uptime, gotify, PVE quorum device?
   - ansible roles
   - backups?
 - terraform

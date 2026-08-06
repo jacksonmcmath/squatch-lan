@@ -1,0 +1,99 @@
+name: lube-logger
+
+services:
+  web-server:
+    image: ghcr.io/hargata/lubelogger:latest
+    restart: unless-stopped
+    init: true
+    depends_on:
+      - database
+    networks:
+      - private-lube-logger
+      - public-lube-logger
+    expose:
+      - 8080
+    environment:
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+      POSTGRES_CONNECTION: Host=database:5432;Username=${PG_USERNAME};Password=${PG_PASSWORD};Database=${PG_DATABASE};
+      LUBELOGGER_INVARIANT_API: true
+    volumes:
+      - ./data:/App/data
+      - ./keys:/root/.aspnet/DataProtection-Keys
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-lube-logger
+      traefik.http.routers.lube-logger.rule: Host(`garage.squ4tch.net`) || Host(`garage.squatch.dev`)
+      traefik.http.routers.lube-logger.entrypoints: websecure
+      traefik.http.routers.lube-logger.tls: true
+      traefik.http.routers.lube-logger.tls.certresolver: le
+      traefik.http.services.lube-logger.loadbalancer.server.port: 8080
+    user: 1000:1000
+    read_only: true
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=128m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 256M
+          pids: 64
+        reservations:
+          cpus: 0.05
+          memory: 64M
+  
+  mcp-server:
+    image: ghcr.io/hargata/lubelogger_mcp:latest
+    restart: unless-stopped
+    init: true
+    depends_on:
+      - web-server
+    networks:
+      - private-lube-logger
+      - public-lube-logger
+    expose:
+      - 8080
+    environment:
+      LUBELOG_INSTANCE: http://web-server:8080
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-lube-logger
+      traefik.http.routers.lube-logger-mcp.rule: Host(`mcp.garage.squ4tch.net`) || Host(`mcp.garage.squatch.dev`)
+      traefik.http.routers.lube-logger-mcp.entrypoints: websecure
+      traefik.http.routers.lube-logger-mcp.tls: true
+      traefik.http.routers.lube-logger-mcp.tls.certresolver: le
+      traefik.http.services.lube-logger-mcp.loadbalancer.server.port: 8080
+    user: 1000:1000
+    read_only: true
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=128m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 256M
+          pids: 64
+        reservations:
+          cpus: 0.05
+          memory: 64M
+
+  database:
+    extends:
+      file: ../../base/postgres/compose.yaml
+      service: postgres
+
+networks:
+  private-lube-logger:
+    name: private-lube-logger
+    internal: true
+  public-lube-logger:
+    name: public-lube-logger
+    external: true

@@ -1,0 +1,37 @@
+services:
+  socket-proxy:
+    image: linuxserver/socket-proxy:latest
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 5s
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 2375"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    # networks:
+    #   - private-***
+    expose:
+      - 2375
+    # environment:
+    #   TZ: America/New_York
+    #   PING: 1
+    #   VERSION: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.25
+          memory: 64M
+          pids: 16
+        reservations:
+          cpus: 0.01
+          memory: 16M

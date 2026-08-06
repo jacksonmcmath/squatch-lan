@@ -1,0 +1,5 @@
+- name: Restart nut-server
+  ansible.builtin.systemd_service:
+    name: nut-server
+    state: restarted
+    enabled: true

@@ -1,0 +1,34 @@
+name: seerr
+
+services:
+  server:
+    image: ghcr.io/hotio/seerr:latest
+    restart: unless-stopped
+    networks:
+      - public-seerr
+    expose:
+      - 5055
+    environment:
+      TZ: America/New_York
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-seerr
+      traefik.http.routers.seerr.rule: Host(`requests.plex.squ4tch.net`) || Host(`requests.plex.squatch.dev`)
+      traefik.http.routers.seerr.entrypoints: websecure
+      traefik.http.routers.seerr.tls: true
+      traefik.http.routers.seerr.tls.certresolver: le
+      traefik.http.services.seerr.loadbalancer.server.port: 5055
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 256M
+          pids: 64
+        reservations:
+          cpus: 0.05
+          memory: 64M
+
+networks:
+  public-seerr:
+    name: public-seerr
+    external: true

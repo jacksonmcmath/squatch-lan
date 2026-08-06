@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Squatch LAN — Security Check</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="{{ .FrontendJS }}" async defer></script>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:           #0c1a0e;
+      --grid-line:    rgba(74, 185, 107, 0.07);
+      --card-bg:      #ffffff;
+      --card-border:  #dde8df;
+      --card-shadow:  0 0 0 1px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.12);
+      --accent:       #2e8b4e;
+      --accent-bg:    #eaf5ee;
+      --accent-text:  #1d6636;
+      --text:         #182b1c;
+      --text-muted:   #6a7e6d;
+      --divider:      #e4ede6;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 36px 36px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* ── Card ─────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      padding: 2.25rem 2rem 1.75rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    /* ── Logo row ─────────────────────────────── */
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    /* Fallback emoji shown when no PNG is provided */
+    .logo-emoji {
+      font-size: 2.4rem;
+      line-height: 1;
+      display: block;
+    }
+
+    .logo-wordmark {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.4px;
+    }
+
+    .logo-wordmark .accent {
+      color: var(--accent);
+    }
+
+    /* ── Divider ──────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--divider);
+      margin: 0 0 1.6rem;
+    }
+
+    /* ── Badge ────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent-text);
+      background: var(--accent-bg);
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      margin-bottom: 1.1rem;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+
+    /* ── Copy ─────────────────────────────────── */
+    h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.75rem;
+    }
+
+    /* ── Captcha widget area ─────────────────── */
+    .captcha-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.6rem;
+      min-height: 78px; /* reserves space while widget loads */
+    }
+
+    /* ── Footer attribution ───────────────────── */
+    .attribution {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding-top: 1rem;
+      border-top: 1px solid var(--divider);
+    }
+
+    .attribution a {
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .attribution a:hover {
+      color: var(--text);
+    }
+
+    .crowdsec-icon {
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+
+    /* ── Page corner tag (techy detail) ───────── */
+    .corner-tag {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: rgba(74, 185, 107, 0.35);
+      font-family: 'Courier New', monospace;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- Logo -->
+    <div class="logo-row">
+      <img class="logo-img" src="hairy-creature.png" alt="Squatch LAN mascot" />
+      <span class="logo-wordmark">Squatch<span class="accent">LAN</span></span>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Badge -->
+    <div class="badge">
+      <span class="badge-dot" aria-hidden="true"></span>
+      Security Check
+    </div>
+
+    <!-- Copy -->
+    <h1>Hold up, traveler.</h1>
+    <p class="subtitle">
+      Before you step through the treeline, we need to confirm you're not a bot.
+      This'll only take a second.
+    </p>
+
+    <!-- Captcha -->
+    <form action="" method="POST" id="captcha-form">
+      <div class="captcha-wrap">
+        <div
+          id="captcha"
+          class="{{ .FrontendKey }}"
+          data-sitekey="{{ .SiteKey }}"
+          data-callback="captchaCallback"
+        ></div>
+      </div>
+    </form>
+
+    <!-- CrowdSec attribution -->
+    <div class="attribution">
+      <span>Protected by</span>
+      <a href="https://crowdsec.net/" target="_blank" rel="noopener" aria-label="CrowdSec">
+        <svg class="crowdsec-icon" fill="currentColor" width="14" height="14" viewBox="0 0 254.4 253.2" aria-hidden="true">
+          <path d="M59.3 128.4c1.4 2.3 2.5 4.6 3.4 7-1-4.1-2.3-8.1-4.3-12-3.1-6-7.8-5.8-10.7 0-2 4-3.2 8-4.3 12.1 1-2.4 2-4.8 3.4-7.1 3.4-5.8 8.8-6 12.5 0M207.8 128.4a42.9 42.9 0 013.4 7c-1-4.1-2.3-8.1-4.3-12-3.2-6-7.8-5.8-10.7 0-2 4-3.3 8-4.3 12.1.9-2.4 2-4.8 3.4-7.1 3.4-5.8 8.8-6 12.5 0M134.6 92.9c2 3.5 3.6 7 4.8 10.7-1.3-5.4-3-10.6-5.6-15.7-4-7.5-9.7-7.2-13.3 0a75.4 75.4 0 00-5.6 16c1.2-3.8 2.7-7.4 4.7-11 4.1-7.2 10.6-7.5 15 0M43.8 136.8c.9 4.6 3.7 8.3 7.3 9.2 0 2.7 0 5.5.2 8.2.3 3.3.4 6.6 1 9.6.3 2.3 1 2.2 1.3 0 .5-3 .6-6.3 1-9.6l.2-8.2c3.5-1 6.4-4.6 7.2-9.2a17.8 17.8 0 01-9 2.4c-3.5 0-6.6-1-9.2-2.4M192.4 136.8c.8 4.6 3.7 8.3 7.2 9.2 0 2.7 0 5.5.3 8.2.3 3.3.4 6.6 1 9.6.3 2.3.9 2.2 1.2 0 .6-3 .7-6.3 1-9.6.2-2.7.3-5.5.2-8.2 3.6-1 6.4-4.6 7.3-9.2a17.8 17.8 0 01-9.1 2.4c-3.4 0-6.6-1-9.1-2.4M138.3 104.6c-3.1 1.9-7 3-11.3 3-4.3 0-8.2-1.1-11.3-3 1 5.8 4.5 10.3 9 11.5 0 3.4 0 6.8.3 10.2.4 4.1.5 8.2 1.2 12 .4 2.9 1.2 2.7 1.6 0 .7-3.8.8-7.9 1.2-12 .3-3.4.3-6.8.3-10.2 4.5-1.2 8-5.7 9-11.5"/>
+          <path d="M173.3 185.6c-3.2-26.8-6.4-50-8.9-60.7a14.3 14.3 0 0014.1-14h.4a9 9 0 005.6-16.5 14.3 14.3 0 00-3.7-27.2 9 9 0 00-6.9-14.6c2.4-1.1 4.5-3 5.8-5 3.4-5.3 4-29-8-44.4-5-6.3-9.8-2.5-10 1.8-1 13.2-1.1 23-4.5 34.3a9 9 0 00-16-4.1 14.3 14.3 0 00-28.4 0 9 9 0 00-16 4.1c-3.4-11.2-3.5-21.1-4.4-34.3-.3-4.3-5.2-8-10-1.8-12 15.3-11.5 39-8.1 44.4 1.3 2 3.4 3.9 5.8 5a9 9 0 00-7 14.6 14.3 14.3 0 00-3.6 27.2A9 9 0 0075 111h.5a14.5 14.5 0 0014.3 14c-4 17.2-10 66.3-15 111.3l-1.3 13.4a1656.4 1656.4 0 01106.6 0l-1.4-12.7-5.4-51.4"/>
+        </svg>
+        CrowdSec
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Techy corner detail -->
+  <div class="corner-tag" aria-hidden="true">squatch_lan::auth_gate</div>
+
+  <script>
+    function captchaCallback() {
+      setTimeout(function () {
+        document.querySelector('#captcha-form').submit();
+      }, 500);
+    }
+  </script>
+
+</body>
+</html>

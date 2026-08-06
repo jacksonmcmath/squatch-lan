@@ -1,0 +1,4 @@
+rpi:
+  hosts:
+    rpi-01-cloudland-canyon.squatch.dev:
+      ansible_host: 10.129.13.101

@@ -1,0 +1,40 @@
+name: it-tools
+
+services:
+  server:
+    image: sharevb/it-tools:latest
+    restart: unless-stopped
+    init: true
+    networks:
+      - public-it-tools
+    expose:
+      - 8080
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-it-tools
+      traefik.http.routers.it-tools.rule: Host(`it-tools.squ4tch.net`) || Host(`it-tools.squatch.dev`)
+      traefik.http.routers.it-tools.entrypoints: websecure
+      traefik.http.routers.it-tools.tls.certresolver: le
+      traefik.http.services.it-tools.loadbalancer.server.port: 8080
+    user: 1000:1000
+    read_only: true
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=128m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.25
+          memory: 128M
+          pids: 64
+        reservations:
+          cpus: 0.05
+          memory: 32M
+
+networks:
+  public-it-tools:
+    name: public-it-tools
+    external: true

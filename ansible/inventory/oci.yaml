@@ -1,0 +1,7 @@
+oracle:
+  hosts:
+    fenrir.squatch.dev:
+      ansible_host: 129.80.118.51
+
+    hermes.squatch.dev:
+      ansible_host: 1.1.1.1

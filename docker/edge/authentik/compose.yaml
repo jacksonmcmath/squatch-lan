@@ -1,0 +1,133 @@
+name: authentik
+
+services:
+  server:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    restart: unless-stopped
+    init: true
+    command: server
+    depends_on:
+      - database
+    expose:
+      - 9000
+    networks:
+      - private-authentik
+      - public-authentik
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_POSTGRESQL__HOST: database
+      AUTHENTIK_POSTGRESQL__PORT: 5432
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DATABASE}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASSWORD}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USERNAME}
+      AUTHENTIK_EMAIL__HOST: mail.smtp2go.com
+      AUTHENTIK_EMAIL__PORT: 2525
+      AUTHENTIK_EMAIL__USERNAME: ${AUTHENTIK_EMAIL_USERNAME}
+      AUTHENTIK_EMAIL__PASSWORD: ${AUTHENTIK_EMAIL_PASSWORD}
+      AUTHENTIK_EMAIL__USE_SSL: true
+      AUTHENTIK_EMAIL__TIMEOUT: 30
+      AUTHENTIK_EMAIL__FROM: Authentik <auth@squatch.dev>
+    volumes:
+      - ./data:/data
+      - ./custom-templates:/templates
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-authentik
+      traefik.http.routers.authentik.rule: Host(`auth.squatch.dev`)
+      traefik.http.routers.authentik.entrypoints: websecure
+      traefik.http.routers.authentik.tls: true
+      traefik.http.routers.authentik.tls.certresolver: le
+      traefik.http.routers.authentik.middlewares: crowdsec@file
+      traefik.http.services.authentik.loadbalancer.server.port: 9000
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=128m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 1.0
+          memory: 1536M
+          pids: 256
+        reservations:
+          cpus: 0.25
+          memory: 768M
+
+  worker:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    restart: unless-stopped
+    init: true
+    command: worker
+    depends_on:
+      - database
+      - socket-proxy
+    networks:
+      - private-authentik
+    environment:
+      DOCKER_HOST: tcp://socket-proxy:2375
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_POSTGRESQL__HOST: database
+      AUTHENTIK_POSTGRESQL__PORT: 5432
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DATABASE}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASSWORD}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USERNAME}
+      AUTHENTIK_EMAIL__HOST: mail.smtp2go.com
+      AUTHENTIK_EMAIL__PORT: 2525
+      AUTHENTIK_EMAIL__USERNAME: ${AUTHENTIK_EMAIL_USERNAME}
+      AUTHENTIK_EMAIL__PASSWORD: ${AUTHENTIK_EMAIL_PASSWORD}
+      AUTHENTIK_EMAIL__USE_TLS: true
+      AUTHENTIK_EMAIL__USE_SSL: false
+      AUTHENTIK_EMAIL__TIMEOUT: 30
+      AUTHENTIK_EMAIL__FROM: auth@squatch.dev
+    volumes:
+      - ./data:/data
+      - ./certs:/certs
+      - ./custom-templates:/templates
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=128m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.75
+          memory: 768M
+          pids: 128
+        reservations:
+          cpus: 0.10
+          memory: 256M
+
+  database:
+    extends:
+      file: ../../base/postgres/compose.yaml
+      service: postgres
+    networks:
+      - private-authentik
+  
+  socket-proxy:
+    extends:
+      file: ../../base/socket-proxy/compose.yaml
+      service: socket-proxy
+    networks:
+      - private-authentik
+    environment:
+      TZ: America/New_York
+      CONTAINERS: 1
+      IMAGES: 1
+      EVENTS: 1
+      PING: 1
+      VERSION: 1
+      POST: 1
+      INFO: 1
+
+networks:
+  private-authentik:
+    name: private-authentik
+    internal: true
+  public-authentik:
+    name: public-authentik
+    external: true

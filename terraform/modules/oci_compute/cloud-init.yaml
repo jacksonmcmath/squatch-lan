@@ -1,0 +1,60 @@
+#cloud-config
+hostname: ${hostname}
+fqdn: ${hostname}.localdomain
+
+# Update packages and install basic tools
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - wget
+  - git
+  - htop
+  - unzip
+  - vim
+  - fail2ban
+  - ufw
+
+# Configure firewall
+runcmd:
+  # Enable and configure UFW
+  - ufw --force enable
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow ssh
+  - ufw allow http
+  - ufw allow https
+  
+  # Configure fail2ban
+  - systemctl enable fail2ban
+  - systemctl start fail2ban
+  
+  # Update system
+  - apt-get autoremove -y
+  - apt-get autoclean
+
+# Configure timezone
+timezone: UTC
+
+# Disable root login and configure SSH
+ssh_pwauth: false
+disable_root: true
+
+# Create swap file (useful for low memory instances)
+swap:
+  filename: /swapfile
+  size: 1073741824  # 1GB
+  maxsize: 1073741824
+
+# Set up automatic security updates
+write_files:
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::AutocleanInterval "7";
+    permissions: '0644'
+
+# Final message
+final_message: "Cloud-init setup complete. System ready for use."

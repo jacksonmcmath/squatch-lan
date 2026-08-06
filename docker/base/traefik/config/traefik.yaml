@@ -1,0 +1,58 @@
+entrypoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: :443
+    http:
+      tls: true
+
+providers:
+  docker:
+    endpoint: tcp://socket-proxy:2375
+    exposedByDefault: false
+    watch: true
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+api:
+  insecure: false
+  dashboard: true
+
+log:
+  level: INFO
+accessLog:
+  filePath: /var/log/traefik/access.log
+  fields:
+    names:
+      StartUTC: drop
+# metrics:
+#   prometheus: {}
+
+certificatesResolvers:
+  le:
+    acme:
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - 1.1.1.1
+          - 1.0.0.1
+      email: jacksonmcmath@gmail.com
+      storage: /etc/traefik/tls/letsencrypt/acme.json
+
+experimental:
+  plugins:
+    crowdsec-bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.5.1
+    cloudflarewarp:
+      moduleName: github.com/BetterCorp/cloudflarewarp
+      version: v1.3.3

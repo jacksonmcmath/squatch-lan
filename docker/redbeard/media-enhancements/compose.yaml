@@ -1,0 +1,113 @@
+services:
+  kometa:
+    image: kometateam/kometa:latest
+    restart: unless-stopped
+    volumes:
+      - ./kometa:/config
+    environment:
+      TZ: America/New_York
+      PUID: 100900
+      PGID: 100900
+      UMASK: 002
+      KOMETA_CONFIG: /config/config.yaml
+
+  ersatztv:
+    image: ghcr.io/ersatztv/ersatztv:latest
+    restart: unless-stopped
+    networks:
+      - public-ersatztv
+    expose:
+      - 8409
+    environment:
+      PUID: 100900
+      PGID: 100900
+      UMASK: 002
+      TZ: America/New_York
+    volumes:
+      - ./ersatztv:/config
+      - /mnt/servarr:/servarr:ro
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-ersatztv
+      traefik.http.routers.ersatztv.rule: Host(`tv.servarr.squ4tch.net`)
+      traefik.http.routers.ersatztv.entrypoints: websecure
+      traefik.http.routers.ersatztv.tls: true
+      traefik.http.routers.ersatztv.tls.certresolver: le
+      traefik.http.services.ersatztv.loadbalancer.server.port: 8409
+    tmpfs:
+      - /transcode
+    devices:
+      - /dev/dri:/dev/dri
+
+  tautulli:
+    image: ghcr.io/hotio/tautulli:latest
+    restart: unless-stopped
+    networks:
+      - public-tautulli
+    expose:
+      - 8181
+    environment:
+      PUID: 100941
+      PGID: 100900
+      UMASK: 002
+      TZ: America/New_York
+    volumes:
+      - ./tautulli:/config
+      - /mnt/servarr/media:/servarr/media
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-tautulli
+      traefik.http.routers.tautulli.rule: Host(`metrics.servarr.squ4tch.net`)
+      traefik.http.routers.tautulli.entrypoints: websecure
+      traefik.http.routers.tautulli.tls: true
+      traefik.http.routers.tautulli.tls.certresolver: le
+      traefik.http.services.tautulli.loadbalancer.server.port: 8181
+    deploy:
+      resources:
+        limits:
+          cpus: 2.0
+          memory: 1G
+          pids: 256
+        reservations:
+          cpus: 0.2
+          memory: 128M
+
+  multi-scrobbler:
+    image: foxxmd/multi-scrobbler:latest
+    restart: unless-stopped
+    networks:
+      - public-multi-scrobbler
+    expose:
+      - 9078
+    environment:
+      TZ: America/New_York
+      ALL_SPOTIFY_CLIENT_ID: ${MULTI_SCROBBLER_SPOTIFY_CLIENT_ID}
+      ALL_SPOTIFY_CLIENT_SECRET: ${MULTI_SCROBBLER_SPOTIFY_CLIENT_SECRET}
+      JRM_PLEX_TOKEN: ${JRM_PLEX_TOKEN}
+      JRM_LISTEN_BRAINZ_TOKEN: ${JRM_LISTEN_BRAINZ_TOKEN}
+      JRM_LAST_FM_API_KEY: ${JRM_LAST_FM_API_KEY}
+      JRM_LAST_FM_SHARED_SECRET: ${JRM_LAST_FM_SHARED_SECRET}
+    volumes:
+      - ./multi-scrobbler:/config
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-multi-scrobbler
+      traefik.http.routers.multi-scrobbler.rule: Host(`scrobbles.servarr.squ4tch.net`)
+      traefik.http.routers.multi-scrobbler.entrypoints: websecure
+      traefik.http.routers.multi-scrobbler.tls: true
+      traefik.http.routers.multi-scrobbler.tls.certresolver: le
+      traefik.http.services.multi-scrobbler.loadbalancer.server.port: 9078
+
+networks:
+  public-kometa:
+    name: public-kometa
+    driver: bridge
+  public-ersatztv:
+    name: public-ersatztv
+    external: true
+  public-tautulli:
+    name: public-tautulli
+    external: true
+  public-multi-scrobbler:
+    name: public-multi-scrobbler
+    external: true

@@ -1,0 +1,16 @@
+- name: Configure a standalone Raspberry Pi
+  # hosts: rpi-01-cloudland-canyon.squatch.dev
+  hosts: openclaw.squ4tch.net
+  remote_user: root
+  become: false
+  gather_facts: false
+  roles:
+    - role: create_user
+      user: "{{ squ4tch_user }}"
+    - role: create_user
+      user: "{{ jrm_user }}"
+    - role: ssh
+
+    # - role: network_ups_tools/server
+    #   upses: "{{ nut_upses }}"
+    #   users: "{{ nut_users }}"

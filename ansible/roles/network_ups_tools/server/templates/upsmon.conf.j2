@@ -1,0 +1,5 @@
+{{ ansible_managed | comment }}
+
+{% for name, ups in upses.items() if ups.monitored_by -%}
+MONITOR {{ name }}@localhost 1 {{ ups.monitored_by }} {{ users[ups.monitored_by].password }} primary
+{% endfor -%}

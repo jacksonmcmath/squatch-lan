@@ -1,0 +1,65 @@
+name: open-webui
+
+services:
+  server:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    init: true
+    depends_on:
+      - database
+    networks:
+      - private-open-webui
+      - public-open-webui
+    expose:
+      - 3000
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_USER: ${PG_USERNAME}
+      DATABASE_PASSWORD: ${PG_PASSWORD}
+      DATABASE_HOST: database
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${PG_DATABASE}
+      VECTOR_DB: pgvector
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
+      CORS_ALLOW_ORIGIN: https://chat.squatch.dev;https://chat.squ4tch.net;http://localhost:3000
+    volumes:
+      - ./server-data:/app/backend/data
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-open-webui
+      traefik.http.routers.open-webui.rule: Host(`chat.squ4tch.net`) || Host(`chat.squatch.dev`)
+      traefik.http.routers.open-webui.entrypoints: websecure
+      traefik.http.routers.open-webui.tls: true
+      traefik.http.routers.open-webui.tls.certresolver: le
+      traefik.http.services.open-webui.loadbalancer.server.port: 3000
+    user: 1000:1000
+    tmpfs:
+      - /app/backend/open_webui/static:rw,noexec,nosuid,nodev,size=64m,uid=1000,gid=1000
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 2.00
+          memory: 2g
+          pids: 512
+        reservations:
+          cpus: 0.20
+          memory: 512m
+  
+  database:
+    extends:
+      file: ../../base/postgres/compose.yaml
+      service: pgvector
+    networks:
+      - private-open-webui
+
+networks:
+  private-open-webui:
+    name: private-open-webui
+    internal: true
+  public-open-webui:
+    name: public-open-webui
+    external: true

@@ -1,0 +1,5 @@
+defaults:
+  secrets:
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: op-secret-store

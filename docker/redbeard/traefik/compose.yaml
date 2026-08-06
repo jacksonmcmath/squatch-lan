@@ -1,0 +1,91 @@
+services:
+  reverse-proxy:
+    extends:
+      file: ../../base/traefik/compose.yaml
+      service: traefik-reverse-proxy
+    networks:
+      - private-traefik
+      - public-traefik
+      - public-dockhand
+      - public-homarr
+      - public-qbittorrent
+      - public-sabnzbd
+      - public-slskd
+      - public-ersatztv
+      - public-tautulli
+      - public-multi-scrobbler
+      - public-prowlarr
+      - public-radarr
+      - public-sonarr
+      - public-lidarr
+      - public-readarr
+      - public-bazarr
+      - public-tdarr
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-traefik
+      traefik.http.routers.dashboard.rule: Host(`ingress.servarr.squ4tch.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      traefik.http.routers.dashboard.entrypoints: websecure
+      traefik.http.routers.dashboard.tls: true
+      traefik.http.routers.dashboard.tls.certresolver: le
+      traefik.http.routers.dashboard.service: api@internal
+      traefik.http.routers.dashboard.middlewares: authentik@file
+  
+  socket-proxy:
+    extends:
+      file: ../../base/traefik/compose.yaml
+      service: docker-socket-proxy
+
+networks:
+  private-traefik:
+    name: private-traefik
+    driver: bridge
+    internal: true
+  public-traefik:
+    name: public-traefik
+    driver: bridge
+  public-dockhand:
+    name: public-dockhand
+    driver: bridge
+  public-homarr:
+    name: public-homarr
+    driver: bridge
+  public-qbittorrent:
+    name: public-qbittorrent
+    driver: bridge
+  public-sabnzbd:
+    name: public-sabnzbd
+    driver: bridge
+  public-slskd:
+    name: public-slskd
+    driver: bridge
+  public-ersatztv:
+    name: public-ersatztv
+    driver: bridge
+  public-tautulli:
+    name: public-tautulli
+    driver: bridge
+  public-multi-scrobbler:
+    name: public-multi-scrobbler
+    driver: bridge
+  public-prowlarr:
+    name: public-prowlarr
+    driver: bridge
+  public-radarr:
+    name: public-radarr
+    driver: bridge
+  public-sonarr:
+    name: public-sonarr
+    driver: bridge
+  public-lidarr:
+    name: public-lidarr
+    driver: bridge
+  public-readarr:
+    name: public-readarr
+    driver: bridge
+  public-bazarr:
+    name: public-bazarr
+    driver: bridge
+  public-tdarr:
+    name: public-tdarr
+    driver: bridge

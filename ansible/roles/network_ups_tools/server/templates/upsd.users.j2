@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+
+{%- for username, user in users.items %}
+
+[{{ username }}]
+  password = {{ user.password }}
+  upsmon = {{ user.upsmon }}
+  {%- for action in user.actions %}
+  actions = {{ action }}
+  {%- endfor %}
+  {%- for cmd in user.instcmds %}
+  instcmds = {{ cmd }}
+  {%- endfor %}
+{%- endfor %}

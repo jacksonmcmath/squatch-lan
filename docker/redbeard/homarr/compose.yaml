@@ -1,0 +1,56 @@
+services:
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    expose:
+      - 7575
+    networks:
+      - private
+      - public
+      - socket-proxy-rw
+    volumes:
+      - ./config:/appdata
+    environment:
+      PUID: 100900
+      PGID: 100900
+      UMASK: 002
+      TZ: America/New_York
+      SECRET_ENCRYPTION_KEY: ${HOMARR_ENCRYPTION_KEY}
+      DOCKER_HOSTNAMES: socket-proxy-rw
+      DOCKER_PORTS: 2375
+    labels:
+      traefik.enable: true
+      traefik.http.routers.homarr.rule: Host(`servarr.squ4tch.net`)
+      traefik.http.routers.homarr.entrypoints: websecure
+      traefik.http.routers.homarr.tls: true
+      traefik.http.routers.homarr.tls.certresolver: le
+      traefik.http.services.homarr.loadbalancer.server.port: 7575
+    restart: unless-stopped
+
+  dashdot:
+    container_name: dashdot
+    image: mauricenino/dashdot:latest
+    expose:
+      - 3001
+    networks:
+      - private
+      - public
+    volumes:
+      - /:/mnt/host:ro
+    privileged: true
+    environment:
+      PUID: 100900
+      PGID: 100900
+      TZ: America/New_York
+    restart: unless-stopped
+
+networks:
+  private:
+    name: private
+    external: true
+  public:
+    name: public
+    external: true
+  socket-proxy-rw:
+    name: socket-proxy-rw
+    external: true

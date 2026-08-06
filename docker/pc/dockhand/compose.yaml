@@ -1,0 +1,27 @@
+services:
+  hawser:
+    extends:
+      file: ../../base/dockhand/compose.yaml
+      service: hawser
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-dockhand
+      traefik.http.routers.hawser.rule: Host(`docker.pc.squ4tch.net`)
+      traefik.http.routers.hawser.entrypoints: websecure
+      traefik.http.routers.hawser.tls: true
+      traefik.http.routers.hawser.tls.certresolver: le
+      traefik.http.services.hawser.loadbalancer.server.port: 2376
+  
+  socket-proxy:
+    extends:
+      file: ../../base/dockhand/compose.yaml
+      service: docker-socket-proxy
+
+networks:
+  private-dockhand:
+    name: private-dockhand
+    driver: bridge
+    internal: true
+  public-dockhand:
+    name: public-dockhand
+    external: true

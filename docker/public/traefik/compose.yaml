@@ -1,0 +1,55 @@
+services:
+  reverse-proxy:
+    extends:
+      file: ../../base/traefik/compose.yaml
+      service: traefik-reverse-proxy
+    networks:
+      - private-traefik
+      - public-traefik
+      - public-dockhand
+      - public-immich
+      - public-it-tools
+      - public-lube-logger
+      - public-mealie
+      - public-trek
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-traefik
+      traefik.http.routers.dashboard.rule: Host(`ingress.public.squ4tch.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      traefik.http.routers.dashboard.entrypoints: websecure
+      traefik.http.routers.dashboard.tls: true
+      traefik.http.routers.dashboard.tls.certresolver: le
+      traefik.http.routers.dashboard.service: api@internal
+      traefik.http.routers.dashboard.middlewares: authentik@file
+  
+  socket-proxy:
+    extends:
+      file: ../../base/traefik/compose.yaml
+      service: docker-socket-proxy
+
+networks:
+  private-traefik:
+    name: private-traefik
+    driver: bridge
+    internal: true
+  public-traefik:
+    name: public-traefik
+    driver: bridge
+  public-dockhand:
+    name: public-dockhand
+    driver: bridge
+  public-immich:
+    name: public-immich
+    driver: bridge
+  public-it-tools:
+    name: public-it-tools
+    driver: bridge
+  public-lube-logger:
+    name: public-lube-logger
+    driver: bridge
+  public-mealie:
+    name: public-mealie
+    driver: bridge
+  public-trek:
+    name: public-trek
+    driver: bridge

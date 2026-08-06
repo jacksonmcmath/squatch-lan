@@ -1,0 +1,19 @@
+{{ ansible_managed | comment }}
+
+maxretry = {{ max_retry }}
+pollinterval = {{ poll_interval }}
+
+{%- for name, ups in upses.items() %}
+
+[{{ name }}]
+  driver = "{{ ups.driver }}"
+  port = "{{ ups.port }}"
+  {% if ups.description %}desc = "{{ ups.description }}"{% endif %}
+  {% if ups.vendor_id %}vendorid = "{{ ups.vendor_id }}"{% endif %}
+  {% if ups.product_id %}productid = "{{ ups.product_id }}"{% endif %}
+  {% if ups.vendor %}vendor = "{{ ups.vendor }}"{% endif %}
+  {% if ups.product %}product = "{{ ups.product }}"{% endif %}
+  {% if ups.serial %}serial = "{{ ups.serial }}"{% endif %}
+  {% if ups.bus %}bus = "{{ ups.bus }}"{% endif %}
+  {% if ups.device %}device = "{{ ups.device }}"{% endif %}
+{%- endfor %}

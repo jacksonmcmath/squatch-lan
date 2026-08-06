@@ -1,0 +1,58 @@
+- name: Install Network UPS Tools (NUT) Server
+  ansible.builtin.apt:
+    name: nut
+    state: present
+
+- name: Apply NUT services configuration
+  ansible.builtin.template:
+    src: nut.conf.j2
+    dest: /etc/nut/nut.conf
+    owner: root
+    group: nut
+    mode: u=rw,g=r,o=
+  notify: Restart nut-server
+
+- name: Apply UPS configuration
+  ansible.builtin.template:
+    src: ups.conf.j2
+    dest: /etc/nut/ups.conf
+    owner: root
+    group: nut
+    mode: u=rw,g=r,o=
+  notify: Restart nut-server
+
+- name: Apply data server configuration
+  ansible.builtin.template:
+    src: upsd.conf.j2
+    dest: /etc/nut/upsd.conf
+    owner: root
+    group: nut
+    mode: u=rw,g=r,o=
+  notify: Restart nut-server
+
+- name: Apply user configuration
+  ansible.builtin.template:
+    src: upsd.users.j2
+    dest: /etc/nut/upsd.users
+    owner: root
+    group: nut
+    mode: u=rw,g=r,o=
+  notify: Restart nut-server
+
+- name: Apply user configuration
+  ansible.builtin.template:
+    src: upsd.users.j2
+    dest: /etc/nut/upsd.users
+    owner: root
+    group: nut
+    mode: u=rw,g=r,o=
+  notify: Restart nut-server
+
+- name: Apply monitor configuration
+  ansible.builtin.template:
+    src: upsmon.conf.j2
+    dest: /etc/nut/upsmon.conf
+    owner: root
+    group: nut
+    mode: u=rw,g=r,o=
+  notify: Restart nut-server

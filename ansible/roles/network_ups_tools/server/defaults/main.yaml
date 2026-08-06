@@ -1,0 +1,15 @@
+max_retry: 3
+poll_interval: 1
+
+listen_address: 0.0.0.0
+listen_port: 3493
+
+mode: netserver
+
+users:
+  upswired:
+    password: "{{ server_primary_user_password | default('password') }}"
+    upsmon: primary
+  observer:
+    password: "{{ server_secondary_user_password | default('password') }}"
+    upsmon: secondary

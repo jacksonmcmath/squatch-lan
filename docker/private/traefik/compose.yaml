@@ -1,0 +1,55 @@
+services:
+  reverse-proxy:
+    extends:
+      file: ../../base/traefik/compose.yaml
+      service: traefik-reverse-proxy
+    networks:
+      - private-traefik
+      - public-traefik
+      - public-dockhand
+      - public-atuin
+      - public-n8n
+      - public-searxng
+      - public-technitium
+      - public-trmnl
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-traefik
+      traefik.http.routers.dashboard.rule: Host(`ingress.private.squ4tch.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      traefik.http.routers.dashboard.entrypoints: websecure
+      traefik.http.routers.dashboard.tls: true
+      traefik.http.routers.dashboard.tls.certresolver: le
+      traefik.http.routers.dashboard.service: api@internal
+      traefik.http.routers.dashboard.middlewares: authentik@file
+  
+  socket-proxy:
+    extends:
+      file: ../../base/traefik/compose.yaml
+      service: docker-socket-proxy
+
+networks:
+  private-traefik:
+    name: private-traefik
+    driver: bridge
+    internal: true
+  public-traefik:
+    name: public-traefik
+    driver: bridge
+  public-dockhand:
+    name: public-dockhand
+    driver: bridge
+  public-atuin:
+    name: public-atuin
+    driver: bridge
+  public-n8n:
+    name: public-n8n
+    driver: bridge
+  public-searxng:
+    name: public-searxng
+    driver: bridge
+  public-technitium:
+    name: public-technitium
+    driver: bridge
+  public-trmnl:
+    name: public-trmnl
+    driver: bridge

@@ -1,0 +1,148 @@
+services:
+  dockhand:
+    image: fnsys/dockhand:latest
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 15s
+    networks:
+      - private-dockhand
+      - public-dockhand
+    expose:
+      - 3000
+    environment:
+      TZ: America/New_York
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      DATA_DIR: /srv/docker/dockhand/data
+      DATABASE_URL: postgres://${PG_USERNAME}:${PG_PASSWORD}@database:5432/${PG_DATABASE}
+    volumes:
+      - /srv/docker:/srv/docker
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-dockhand
+      traefik.http.routers.dockhand.rule: Host(`docker.squ4tch.net`)
+      traefik.http.routers.dockhand.entrypoints: websecure
+      traefik.http.routers.dockhand.tls: true
+      traefik.http.routers.dockhand.tls.certresolver: le
+      traefik.http.services.dockhand.loadbalancer.server.port: 3000
+    read_only: true
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.25
+          memory: 128M
+          pids: 128
+        reservations:
+          cpus: 0.05
+          memory: 64M
+
+  hawser:
+    image: ghcr.io/finsys/hawser:latest
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    depends_on:
+      - socket-proxy
+    networks:
+      - private-dockhand
+      - public-dockhand
+    expose:
+      - 2376
+    environment:
+      TZ: America/New_York
+      TOKEN: ${HAWSER_TOKEN}
+      # DOCKER_SOCKET: tcp://socket-proxy:2375
+      DOCKER_SOCKET: /var/run/docker.sock
+      STACKS_DIR: /srv/docker
+      AGENT_NAME: ${HAWSER_AGENT_NAME:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # labels:
+    #   traefik.enable: true
+    #   traefik.docker.network: public-dockhand
+    #   traefik.http.routers.hawser.rule: Host(`docker.***.squ4tch.net`)
+    #   traefik.http.routers.hawser.entrypoints: websecure
+    #   traefik.http.routers.hawser.tls: true
+    #   traefik.http.routers.hawser.tls.certresolver: le
+    #   traefik.http.services.hawser.loadbalancer.server.port: 2376
+    read_only: true
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=128m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.25
+          memory: 128M
+          pids: 64
+        reservations:
+          cpus: 0.05
+          memory: 32M
+  
+
+  docker-socket-proxy:
+    image: linuxserver/socket-proxy:latest
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 5s
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 2375"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - private-dockhand
+    expose:
+      - 2375
+    environment:
+      TZ: America/New_York
+      # Required for Dockhand core functionality
+      CONTAINERS: 1
+      IMAGES: 1
+      NETWORKS: 1
+      VOLUMES: 1
+      EVENTS: 1
+      PING: 1
+      VERSION: 1
+      POST: 1
+      # Required for dashboard host info and disk usage
+      INFO: 1
+      SYSTEM: 1
+      # Required for vulnerability scanning
+      ALLOW_START: 1
+      ALLOW_STOP: 1
+      ALLOW_RESTARTS: 1
+      # Required for terminal access
+      EXEC: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.25
+          memory: 64M
+          pids: 16
+        reservations:
+          cpus: 0.01
+          memory: 16M
+  
+  postgres:
+    extends:
+      file: ../postgres/compose.yaml
+      service: postgres
+    networks:
+      - private-dockhand

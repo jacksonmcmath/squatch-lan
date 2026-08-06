@@ -1,0 +1,24 @@
+services:
+  server:
+    extends:
+      file: ../../base/dockhand/compose.yaml
+      service: dockhand
+  
+  socket-proxy:
+    extends:
+      file: ../../base/dockhand/compose.yaml
+      service: docker-socket-proxy
+  
+  database:
+    extends:
+      file: ../../base/dockhand/compose.yaml
+      service: postgres
+
+networks:
+  private-dockhand:
+    name: private-dockhand
+    driver: bridge
+    internal: true
+  public-dockhand:
+    name: public-dockhand
+    external: true

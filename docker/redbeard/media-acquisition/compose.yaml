@@ -1,0 +1,171 @@
+services:
+  qbittorrent:
+    image: ghcr.io/hotio/qbittorrent:latest
+    restart: unless-stopped
+    stop_grace_period: 15s
+    networks:
+      - private-qbittorrent
+      - public-qbittorrent
+    expose:
+      - 8080
+    environment:
+      TZ: America/New_York
+      PUID: 100901
+      PGID: 100900
+      UMASK: 002
+      WEBUI_PORTS: 8080/tcp,8080/udp
+      VPN_ENABLED: true
+      VPN_PROVIDER: pia
+      VPN_PIA_USER: ${PIA_USERNAME}
+      VPN_PIA_PASS: ${PIA_PASSWORD}
+      VPN_AUTO_PORT_FORWARD: true
+      VPN_PIA_PORT_FORWARD_PERSIST: true
+      VPN_FIREWALL_TYPE: nftables
+      VPN_HEALTHCHECK_ENABLED: true
+    volumes:
+      - ./qbittorrent:/config
+      - /mnt/servarr/torrents:/servarr/torrents
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-qbittorrent
+      traefik.http.routers.qbittorrent.rule: Host(`torrents.servarr.squ4tch.net`)
+      traefik.http.routers.qbittorrent.entrypoints: websecure
+      traefik.http.routers.qbittorrent.tls: true
+      traefik.http.routers.qbittorrent.tls.certresolver: le
+      traefik.http.services.qbittorrent.loadbalancer.server.port: 8080
+    tmpfs:
+      - /incomplete
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+    deploy:
+      resources:
+        limits:
+          cpus: 2.0
+          memory: 4G
+          pids: 256
+        reservations:
+          cpus: 0.2
+          memory: 128M
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd:latest
+    restart: unless-stopped
+    stop_grace_period: 15s
+    networks:
+      - private-sabnzbd
+      - public-sabnzbd
+    expose:
+      - 8080
+    environment:
+      TZ: America/New_York
+      PUID: 100902
+      PGID: 100900
+      UMASK: 002
+      WEBUI_PORTS: 8080/tcp,8080/udp
+      VPN_ENABLED: true
+      VPN_PROVIDER: pia
+      VPN_PIA_USER: ${PIA_USERNAME}
+      VPN_PIA_PASS: ${PIA_PASSWORD}
+      VPN_PIA_PREFERRED_REGION: us_atlanta
+      VPN_AUTO_PORT_FORWARD: false
+      VPN_PIA_PORT_FORWARD_PERSIST: false
+      VPN_FIREWALL_TYPE: nftables
+      VPN_HEALTHCHECK_ENABLED: true
+    volumes:
+      - ./sabnzbd:/config
+      - /mnt/servarr/usenet:/servarr/usenet
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-sabnzbd
+      traefik.http.routers.sabnzbd.rule: Host(`nzbs.servarr.squ4tch.net`)
+      traefik.http.routers.sabnzbd.entrypoints: websecure
+      traefik.http.routers.sabnzbd.tls: true
+      traefik.http.routers.sabnzbd.tls.certresolver: le
+      traefik.http.services.sabnzbd.loadbalancer.server.port: 8080
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+    deploy:
+      resources:
+        limits:
+          cpus: 2.0
+          memory: 4G
+          pids: 256
+        reservations:
+          cpus: 0.2
+          memory: 128M
+
+  slskd:
+    image: ghcr.io/hotio/slskd:latest
+    restart: unless-stopped
+    stop_grace_period: 15s
+    networks:
+      - private-slskd
+      - public-slskd
+    expose:
+      - 5030
+      - 5031
+    environment:
+      TZ: America/New_York
+      PUID: 100903
+      PGID: 100900
+      UMASK: 002
+      WEBUI_PORTS: 5030/tcp,5031/tcp
+      VPN_ENABLED: true
+      VPN_PROVIDER: pia
+      VPN_PIA_USER: ${PIA_USERNAME}
+      VPN_PIA_PASS: ${PIA_PASSWORD}
+      VPN_AUTO_PORT_FORWARD: true
+      VPN_PIA_PORT_FORWARD_PERSIST: true
+      VPN_FIREWALL_TYPE: nftables
+      VPN_HEALTHCHECK_ENABLED: true
+    volumes:
+      - ./slskd:/config
+      - /mnt/servarr:/servarr
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-slskd
+      traefik.http.routers.slskd.rule: Host(`slskd.servarr.squ4tch.net`)
+      traefik.http.routers.slskd.entrypoints: websecure
+      traefik.http.routers.slskd.tls: true
+      traefik.http.routers.slskd.tls.certresolver: le
+      traefik.http.services.slskd.loadbalancer.server.port: 5030
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+    deploy:
+      resources:
+        limits:
+          cpus: 2.0
+          memory: 1G
+          pids: 256
+        reservations:
+          cpus: 0.2
+          memory: 128M
+
+networks:
+  private-qbittorrent:
+    name: private-qbittorrent
+    internal: true
+  public-qbittorrent:
+    name: public-qbittorrent
+    external: true
+  private-sabnzbd:
+    name: private-sabnzbd
+    internal: true
+  public-sabnzbd:
+    name: public-sabnzbd
+    external: true
+  private-slskd:
+    name: private-slskd
+    internal: true
+  public-slskd:
+    name: public-slskd
+    external: true

@@ -1,0 +1,22 @@
+nut_upses:
+  ups:
+    driver: usbhid-ups
+    port: auto
+    description: APC Back-UPS Pro 1350S
+    vendor_id: 051D
+    product_id: "0002"
+    vendor: American Power Conversion
+    product: Back-UPS RS 1350MS FW:951.e6 .D USB FW:e6
+    serial: 0B2307N00591
+    monitored_by: upswired
+
+nut_users:
+  upswired:
+    password: password
+    upsmon: primary
+  observer:
+    password: password
+    upsmon: secondary
+  upsmon:
+    password: secret
+    upsmon: secondary

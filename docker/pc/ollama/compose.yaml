@@ -1,0 +1,55 @@
+name: ollama
+
+services:
+  server:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    init: true
+    networks:
+      - private-ollama
+      - public-ollama
+    expose:
+      - 11434
+    environment:
+      UMASK: 002
+      TZ: America/New_York
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_CONTEXT_LENGTH: 64k
+      OLLAMA_ORIGINS: https://ollama.squ4tch.net
+    volumes:
+      - ./config:/root/.ollama
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-ollama
+      traefik.http.routers.ollama.rule: Host(`ollama.squ4tch.net`) || Host(`ollama.squatch.dev`)
+      traefik.http.routers.ollama.entrypoints: websecure
+      traefik.http.routers.ollama.tls: true
+      traefik.http.routers.ollama.tls.certresolver: le
+      traefik.http.services.ollama.loadbalancer.server.port: 11434
+    user: 1000:1000
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 2.00
+          memory: 1G
+          pids: 64
+        reservations:
+          cpus: 0.10
+          memory: 256M
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+
+networks:
+  private-ollama:
+    name: private-ollama
+    internal: true
+  public-ollama:
+    name: public-ollama
+    external: true

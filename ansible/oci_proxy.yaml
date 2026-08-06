@@ -1,0 +1,11 @@
+- name: Configure OCI Proxy
+  hosts: fenrir.squatch.dev
+  remote_user: root
+  roles:
+    # - role: create_user
+    #   user: "{{ squ4tch_user }}"
+    # - role: create_user
+    #   user: "{{ jrm_user }}"
+    # - role: ssh
+    - role: tailscale
+    - role: docker

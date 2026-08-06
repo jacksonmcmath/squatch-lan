@@ -1,0 +1,58 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.3.2
+    restart: unless-stopped
+    init: true
+    networks:
+      - private-uptime-kuma
+      - public-uptime-kuma
+    expose:
+      - 3001
+    environment:
+      TZ: America/New_York
+    volumes:
+      - ./data:/app/data
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-uptime-kuma
+      traefik.http.routers.uptime-kuma.rule: Host(`status.squatch.dev`)
+      traefik.http.routers.uptime-kuma.entrypoints: websecure
+      traefik.http.routers.uptime-kuma.tls: true
+      traefik.http.routers.uptime-kuma.tls.certresolver: le
+      traefik.http.routers.uptime-kuma.middlewares: crowdsec@file
+      traefik.http.services.uptime-kuma.loadbalancer.server.port: 3001
+    tmpfs:
+      - /run:rw,noexec,nosuid,nodev,size=128m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.50
+          memory: 512M
+        reservations:
+          cpus: 0.05
+          memory: 256M
+  
+  socket-proxy:
+    extends:
+      file: ../base/socket-proxy/compose.yaml
+      service: docker-socket-proxy
+    networks:
+      - private-uptime-kuma
+    environment:
+      TZ: America/New_York
+      EVENTS: 1
+      PING: 1
+      VERSION: 1
+      CONTAINERS: 1
+
+networks:
+  private-uptime-kuma:
+    name: private-uptime-kuma
+    internal: true
+  public-uptime-kuma:
+    name: public-uptime-kuma
+    external: true
