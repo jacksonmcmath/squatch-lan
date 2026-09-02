@@ -1,0 +1,22 @@
+title: Family Calendar
+views:
+  - title: Calendar
+    path: calendar
+    icon: mdi:calendar-month
+    type: panel
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              # {{ now().strftime('%A, %B %-d') }}
+              ## {{ now().strftime('%-I:%M %p') }}
+          - type: calendar
+            title: Family Calendar
+            initial_view: dayGridMonth
+            entities:
+              - calendar.family
+              - calendar.jackson
+              - calendar.kristin_work
+              - calendar.anniversaries
+              - calendar.mealie_dinner
