@@ -2,9 +2,13 @@
 
 Native Home Assistant dashboard definitions for a wall-mounted family calendar. No HACS component, custom card, integration, or backend is part of this MVP.
 
+## Status
+
+**v0.0.1 is deployed in Home Assistant.** It is a native, YAML-mode family calendar dashboard; no HACS component, custom card, integration, or backend is in scope.
+
 ## First dashboard
 
-`family-calendar.yaml` is a YAML-mode dashboard. It renders a live date/time header and the native calendar card in month view. The card itself offers native day and seven-day-list views and event details.
+`family-calendar.yaml` renders a live date/time header and the native calendar card in month view. The card itself offers native day and seven-day-list views and event details.
 
 Initial calendar set:
 
@@ -18,12 +22,12 @@ Initial calendar set:
 
 `calendar.jackson_work` is deliberately excluded for now. Calendar/person colors are owned by the underlying calendar sources; keep shared events on `calendar.family` until a person/event model is needed.
 
-## Deploy manually
+## Deploy or update manually
 
-This repository does not yet manage the live Home Assistant configuration, so this change is intentionally **not deployed**.
+The live Home Assistant configuration is not GitOps-managed. Apply dashboard changes manually, then keep this repository's YAML as the source of truth.
 
 1. Copy `family-calendar.yaml` to `<HA config>/dashboards/family-calendar.yaml`.
-2. Add this dashboard registration to `<HA config>/configuration.yaml` (merge with an existing `lovelace:` section; do not duplicate it):
+2. Add this dashboard registration to `<HA config>/configuration.yaml` if it does not already exist (merge with an existing `lovelace:` section; do not duplicate it):
 
    ```yaml
    lovelace:
@@ -46,6 +50,24 @@ This repository does not yet manage the live Home Assistant configuration, so th
 - An event opens to its native detail view.
 - The day and list controls work at the intended tablet resolution.
 - Creating a test event in `calendar.family` works from the display, or the gap is recorded before adding any workaround.
+
+## Work queue
+
+### Now — validate v0.0.1 on the real display
+
+Run the acceptance check above. Record only failures or decisions that change the next release; no customization until the native flow is proven insufficient.
+
+### Next — v0.0.2: tablet operation
+
+Choose the actual display, mount, power, and browser/kiosk setup. Verify touch targets, wake behavior, and recovery after Home Assistant or tablet reboot. This is deployment work, not dashboard feature work.
+
+### Later — one observed daily-workflow improvement
+
+After a week of use, promote exactly one proven need: a today screen, chores, a shopping list, or a calendar-creation workaround. Keep it native unless that single need cannot be met natively.
+
+## Tracking
+
+Keep this README as the product source of truth. Use one GitHub issue per committed work item once GitHub CLI authentication is available; do not add a board, labels, or automation until issue volume makes the README insufficient.
 
 ## Deferred
 
