@@ -10,6 +10,7 @@ services:
       - public-atuin
       - public-n8n
       - public-searxng
+      - public-rsshub
       - public-technitium
       - public-trmnl
     labels:
@@ -46,6 +47,9 @@ networks:
     driver: bridge
   public-searxng:
     name: public-searxng
+    driver: bridge
+  public-rsshub:
+    name: public-rsshub
     driver: bridge
   public-technitium:
     name: public-technitium

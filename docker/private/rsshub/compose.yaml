@@ -1,0 +1,128 @@
+name: rsshub
+
+services:
+  server:
+    image: diygod/rsshub:latest
+    restart: unless-stopped
+    init: true
+    depends_on:
+      redis:
+        condition: service_healthy
+      browserless:
+        condition: service_healthy
+    networks:
+      - private-rsshub
+      - public-rsshub
+    expose:
+      - 1200
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: redis
+      REDIS_URL: redis://redis:6379/
+      PLAYWRIGHT_WS_ENDPOINT: ws://browserless:3000
+      DEBUG_INFO: "false"
+      DISALLOW_ROBOT: "true"
+      NO_LOGFILES: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    labels:
+      traefik.enable: true
+      traefik.docker.network: public-rsshub
+      traefik.http.routers.rsshub.rule: Host(`news.squ4tch.net`)
+      traefik.http.routers.rsshub.entrypoints: websecure
+      traefik.http.routers.rsshub.tls: true
+      traefik.http.routers.rsshub.tls.certresolver: le
+      traefik.http.services.rsshub.loadbalancer.server.port: 1200
+    user: 1000:1000
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=128m,uid=1000,gid=1000
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 1.0
+          memory: 1G
+          pids: 256
+        reservations:
+          cpus: 0.10
+          memory: 256M
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    init: true
+    networks:
+      - private-rsshub
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 0.25
+          memory: 256M
+          pids: 64
+        reservations:
+          cpus: 0.05
+          memory: 64M
+
+  browserless:
+    image: browserless/chrome:latest
+    restart: unless-stopped
+    init: true
+    networks:
+      - private-rsshub
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=256m
+      - /dev/shm:rw,nosuid,nodev,size=512m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: 1.0
+          memory: 1G
+          pids: 256
+        reservations:
+          cpus: 0.10
+          memory: 256M
+
+networks:
+  private-rsshub:
+    name: private-rsshub
+    internal: true
+  public-rsshub:
+    name: public-rsshub
+    external: true
+
+volumes:
+  redis-data:
