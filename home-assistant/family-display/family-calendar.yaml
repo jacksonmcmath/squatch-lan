@@ -11,6 +11,13 @@ views:
             content: |
               # {{ now().strftime('%A, %B %-d') }}
               ## {{ now().strftime('%-I:%M %p') }}
+          - type: button
+            name: Add Family Event
+            icon: mdi:calendar-plus
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /family-calendar/add-event
           - type: calendar
             title: Family Calendar
             initial_view: dayGridMonth
@@ -20,3 +27,26 @@ views:
               - calendar.kristin_work
               - calendar.anniversaries
               - calendar.mealie_dinner
+  - title: Add Event
+    path: add-event
+    icon: mdi:calendar-plus
+    cards:
+      - type: entities
+        title: Add Family Event
+        show_header_toggle: false
+        entities:
+          - entity: input_text.calendar_event_title
+            name: Title
+          - entity: input_datetime.calendar_event_start
+            name: Start
+          - entity: input_datetime.calendar_event_end
+            name: End
+      - type: button
+        name: Add to Family Calendar
+        icon: mdi:calendar-check
+        show_state: false
+        tap_action:
+          action: perform-action
+          perform_action: script.turn_on
+          data:
+            entity_id: script.create_google_calendar_event

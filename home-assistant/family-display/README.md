@@ -20,6 +20,10 @@ Initial calendar set:
 | `calendar.anniversaries` | Anniversaries |
 | `calendar.mealie_dinner` | Dinner plan |
 
+## Event entry
+
+The **Add Family Event** view is a title/start/end form that calls the existing `script.create_google_calendar_event`. It reuses the deployed `calendar_event_title`, `calendar_event_start`, and `calendar_event_end` helpers; the current active calendar is `family`. It deliberately excludes calendar selection, all-day events, editing, and recurrence.
+
 `calendar.jackson_work` is deliberately excluded for now. Calendar/person colors are owned by the underlying calendar sources; keep shared events on `calendar.family` until a person/event model is needed.
 
 ## Deploy or update manually
@@ -50,14 +54,15 @@ The live Home Assistant configuration is not GitOps-managed. Apply dashboard cha
 - An event opens to its native detail view.
 - The day and list controls work at the intended tablet resolution.
 - Creating a test event in `calendar.family` works from the display, or the gap is recorded before adding any workaround.
+- The Add Family Event view creates a timed `calendar.family` event from a title, start, and end.
 
 ## Work queue
 
-### Now — validate v0.0.1 on the real display
+### Now — validate direct Family event entry
 
-Run the acceptance check above. Record only failures or decisions that change the next release; no customization until the native flow is proven insufficient.
+Deploy this dashboard update and create one timed test event through **Add Family Event**. Do not add fields until the three-field flow is used.
 
-### Next — v0.0.2: tablet operation
+### Next — tablet operation
 
 Choose the actual display, mount, power, and browser/kiosk setup. Verify touch targets, wake behavior, and recovery after Home Assistant or tablet reboot. This is deployment work, not dashboard feature work.
 
